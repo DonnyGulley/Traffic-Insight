@@ -1,4 +1,4 @@
-from business.business_access_layer import BusinessAccessLayer
+from Business.business_access_layer import BusinessAccessLayer
 
 bus = BusinessAccessLayer()   
 
