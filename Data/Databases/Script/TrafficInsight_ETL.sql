@@ -1,9 +1,9 @@
-Create Database [TrafficInsight_ETL]
-Go
+CREATE DATABASE [TrafficInsight_ETL]
+GO
 
 USE [TrafficInsight_ETL]
 GO
-/****** Object:  Table [dbo].[AccidentDetails]    Script Date: 2024-11-23 8:38:41 AM ******/
+/****** Object:  Table [dbo].[AccidentDetails]    Script Date: 2024-11-28 9:29:21 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -25,13 +25,13 @@ CREATE TABLE [dbo].[AccidentDetails](
 	[Latitude] [float] NULL,
 	[AccidentLocation] [varchar](255) NULL,
 	[CollisionTypeID] [int] NULL,
-	[ClassificationID] [int] NULL,
+	[ClassificationofAccidentID] [int] NULL,
 	[ImpactLocationID] [int] NULL,
 	[InitialDirectionOfTravelOne] [varchar](50) NULL,
 	[InitialDirectionOfTravelTwo] [varchar](50) NULL,
 	[InitialImpactType] [varchar](50) NULL,
 	[IntTrafficControl] [varchar](50) NULL,
-	[LightConditionID] [int] NULL,
+	[LightID] [int] NULL,
 	[LightForReport] [varchar](50) NULL,
 	[RoadJurisdiction] [varchar](50) NULL,
 	[TrafficControlID] [int] NULL,
@@ -43,33 +43,30 @@ CREATE TABLE [dbo].[AccidentDetails](
 	[CyclistInvolved] [bit] NULL,
 	[MotorcyclistInvolved] [bit] NULL,
 	[EnvironmentCondition1] [varchar](50) NULL,
-	[EnvironmentCondition2] [varchar](50) NULL,
 	[SelfReported] [bit] NULL,
 	[XmlImportNotes] [varchar](255) NULL,
 	[LastEditedDate] [datetime] NULL,
-	[CreatedBy] [varchar](50) NULL,
-	[CreateDate] [datetime] NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[OBJECTID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Classifications]    Script Date: 2024-11-23 8:38:41 AM ******/
+/****** Object:  Table [dbo].[ClassificationofAccident]    Script Date: 2024-11-28 9:29:21 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [dbo].[Classifications](
-	[ClassificationID] [int] IDENTITY(1,1) NOT NULL,
-	[Classification] [varchar](50) NULL,
+CREATE TABLE [dbo].[ClassificationofAccident](
+	[ClassificationofAccidentID] [int] IDENTITY(1,1) NOT NULL,
+	[ClassificationofAccident] [varchar](50) NULL,
 PRIMARY KEY CLUSTERED 
 (
-	[ClassificationID] ASC
+	[ClassificationofAccidentID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[CollisionTypes]    Script Date: 2024-11-23 8:38:41 AM ******/
+/****** Object:  Table [dbo].[CollisionTypes]    Script Date: 2024-11-28 9:29:21 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -83,7 +80,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[ImpactLocations]    Script Date: 2024-11-23 8:38:41 AM ******/
+/****** Object:  Table [dbo].[ImpactLocations]    Script Date: 2024-11-28 9:29:21 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -97,21 +94,21 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[LightConditions]    Script Date: 2024-11-23 8:38:41 AM ******/
+/****** Object:  Table [dbo].[LightConditions]    Script Date: 2024-11-28 9:29:21 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [dbo].[LightConditions](
-	[LightConditionID] [int] IDENTITY(1,1) NOT NULL,
-	[LightCondition] [varchar](50) NULL,
+	[LightID] [int] IDENTITY(1,1) NOT NULL,
+	[Light] [varchar](50) NULL,
 PRIMARY KEY CLUSTERED 
 (
-	[LightConditionID] ASC
+	[LightID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[TrafficControls]    Script Date: 2024-11-23 8:38:41 AM ******/
+/****** Object:  Table [dbo].[TrafficControls]    Script Date: 2024-11-28 9:29:21 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -125,8 +122,8 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-ALTER TABLE [dbo].[AccidentDetails]  WITH CHECK ADD  CONSTRAINT [FK_AccidentDetails_Classifications] FOREIGN KEY([ClassificationID])
-REFERENCES [dbo].[Classifications] ([ClassificationID])
+ALTER TABLE [dbo].[AccidentDetails]  WITH CHECK ADD  CONSTRAINT [FK_AccidentDetails_Classifications] FOREIGN KEY([ClassificationofAccidentID])
+REFERENCES [dbo].[ClassificationofAccident] ([ClassificationofAccidentID])
 GO
 ALTER TABLE [dbo].[AccidentDetails] CHECK CONSTRAINT [FK_AccidentDetails_Classifications]
 GO
@@ -140,10 +137,10 @@ REFERENCES [dbo].[ImpactLocations] ([ImpactLocationID])
 GO
 ALTER TABLE [dbo].[AccidentDetails] CHECK CONSTRAINT [FK_AccidentDetails_ImpactLocations]
 GO
-ALTER TABLE [dbo].[AccidentDetails]  WITH CHECK ADD  CONSTRAINT [FK_AccidentDetails_LightConditions] FOREIGN KEY([LightConditionID])
-REFERENCES [dbo].[LightConditions] ([LightConditionID])
+ALTER TABLE [dbo].[AccidentDetails]  WITH CHECK ADD  CONSTRAINT [FK_AccidentDetails_LightConditions1] FOREIGN KEY([LightID])
+REFERENCES [dbo].[LightConditions] ([LightID])
 GO
-ALTER TABLE [dbo].[AccidentDetails] CHECK CONSTRAINT [FK_AccidentDetails_LightConditions]
+ALTER TABLE [dbo].[AccidentDetails] CHECK CONSTRAINT [FK_AccidentDetails_LightConditions1]
 GO
 ALTER TABLE [dbo].[AccidentDetails]  WITH CHECK ADD  CONSTRAINT [FK_AccidentDetails_TrafficControls] FOREIGN KEY([TrafficControlID])
 REFERENCES [dbo].[TrafficControls] ([TrafficControlID])
