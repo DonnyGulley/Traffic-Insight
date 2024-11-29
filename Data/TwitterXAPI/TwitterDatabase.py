@@ -26,14 +26,13 @@ class TwitterDatabase:
             print(f"Error fetching last tweet ID: {e}")
             return None
 
-    def store_tweets(self, tweets, city):
+    def store_tweets(self, tweets):
         cursor = None
         try:
             data = {
                 "TweetID": [tweet['TweetID'] for tweet in tweets],
                 "TweetText": [tweet['TweetText'] for tweet in tweets],
-                "CreatedAt": [tweet['CreatedAt'] for tweet in tweets],
-                "City": [city] * len(tweets)
+                "CreatedAt": [tweet['CreatedAt'] for tweet in tweets]
             }
             df = pd.DataFrame(data)
 
@@ -43,9 +42,9 @@ class TwitterDatabase:
                 cursor.execute("SELECT COUNT(*) FROM Tweets WHERE TweetID = ?", row.TweetID)
                 if cursor.fetchone()[0] == 0:  # No record found
                     cursor.execute("""
-                        INSERT INTO Tweets (TweetID, TweetText, CreatedAt, City)
-                        VALUES (?, ?, ?, ?)
-                    """, row.TweetID, row.TweetText, row.CreatedAt, row.City)
+                        INSERT INTO Tweets (TweetID, TweetText, CreatedAt)
+                        VALUES (?, ?, ?)
+                    """, row.TweetID, row.TweetText, row.CreatedAt)
                     print(f"New tweet inserted: {row.TweetID}")
                 else:
                     print(f"Duplicate tweet found, skipping: {row.TweetID}")
@@ -59,12 +58,11 @@ class TwitterDatabase:
             if cursor:
                 cursor.close()
 
-    def save_tweets_to_file(self, tweets, city, data_file):
+    def save_tweets_to_file(self, tweets, data_file):
         data = {
             "TweetID": [tweet.id for tweet in tweets],
             "TweetText": [tweet.text for tweet in tweets],
-            "CreatedAt": [tweet.created_at for tweet in tweets],
-            "City": [city] * len(tweets)
+            "CreatedAt": [tweet.created_at for tweet in tweets]
         }
 
         df = pd.DataFrame(data)
