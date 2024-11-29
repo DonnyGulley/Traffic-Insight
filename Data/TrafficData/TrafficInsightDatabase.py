@@ -1,41 +1,6 @@
-import requests
+# traffic_data_loader.py
 import pandas as pd
 import pyodbc
-import os
-from datetime import datetime
-
-class TrafficCollisionsAPI:
-    def __init__(self, url, params):
-        self.url = url
-        self.params = params
-        self.df = None
-        print("Initialized TrafficCollisionsAPI with URL and parameters.")
-
-    def fetch_data(self):
-        """Fetch data from the API and convert to DataFrame."""
-        print("Fetching data from the ArcGIS REST service...")
-        response = requests.get(self.url, params=self.params)
-        response.raise_for_status()  # Check for request errors
-        print("Data fetched successfully.")
-        data = response.json()
-        features = data['features']
-        records = [feature['attributes'] for feature in features]
-        self.df = pd.DataFrame(records)
-        print("Data processed into DataFrame.")
-        print("Columns in DataFrame:", self.df.columns)
-
-    def save_to_csv(self, folder):
-        """Save data as CSV with a timestamp."""
-        if not os.path.exists(folder):
-            os.makedirs(folder)
-        current_datetime = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = f"traffic_collisions_{current_datetime}.csv"
-        filepath = os.path.join(folder, filename)
-        print(f"Saving data to {filepath}...")
-        self.df.to_csv(filepath, index=False)
-        print(f"Data has been saved to {filepath}")
-        return filepath
-
 
 class TrafficDataLoader:
     def __init__(self, file_path, connection_string):
@@ -46,7 +11,9 @@ class TrafficDataLoader:
     def load_data(self):
         """Load data from CSV file."""
         print(f"Loading data from file: {self.file_path}")
+        
         self.df = pd.read_csv(self.file_path)
+        
         print("Data loaded into DataFrame.")
         print("Columns in DataFrame:", self.df.columns)
 
@@ -100,13 +67,11 @@ class TrafficDataLoader:
         column_mapping = self.column_mapping()
         self.df = self.df.rename(columns=column_mapping)
 
-        # Remove unused date columns 
-        
         # Convert date columns to datetime
-        date_columns = ['AccidentDate', 'LastEditedDate']
-        for col in date_columns:
-            if col in self.df.columns:
-                self.df[col] = pd.to_datetime(self.df[col], errors='coerce')
+        self.df['LastEditedDate'] = pd.to_datetime(self.df['LastEditedDate'], errors='coerce')
+
+        self.df['AccidentDate'] = pd.to_datetime(self.df['AccidentDate'], unit='ms', errors='coerce')
+
 
         # Example of additional transformations (e.g., converting numeric columns)
         if 'NumVehicles' in self.df.columns:
@@ -206,7 +171,7 @@ class TrafficDataLoader:
         collision_type_map = self.get_id_map('CollisionTypes', 'COLLISIONTYPE')
         classification_map = self.get_id_map('ClassificationofAccident', 'ClassificationofAccident')
         impact_location_map = self.get_id_map('ImpactLocations', 'ImpactLocation')
-        light_condition_map = self.get_id_map('LightConditions', 'LightCondition')
+        light_condition_map = self.get_id_map('LightConditions', 'Light')
         traffic_control_map = self.get_id_map('TrafficControls', 'TrafficControl')
 
         # Debug prints to check mapping dictionaries
@@ -219,14 +184,14 @@ class TrafficDataLoader:
         accident_details['CollisionTypeID'] = accident_details['COLLISIONTYPE'].map(collision_type_map)
         accident_details['ClassificationofAccidentID'] = accident_details['CLASSIFICATIONOFACCIDENT'].map(classification_map)
         accident_details['ImpactLocationID'] = accident_details['IMPACTLOCATION'].map(impact_location_map)
-        accident_details['LightConditionID'] = accident_details['LIGHT'].map(light_condition_map)
+        accident_details['LightID'] = accident_details['LIGHT'].map(light_condition_map)
         accident_details['TrafficControlID'] = accident_details['TRAFFICCONTROL'].map(traffic_control_map)
 
         # Check for null values after mapping
         print("Null values in CollisionTypeID:", accident_details['CollisionTypeID'].isnull().sum())
         print("Null values in ClassificationID:", accident_details['ClassificationofAccidentID'].isnull().sum())
         print("Null values in ImpactLocationID:", accident_details['ImpactLocationID'].isnull().sum())
-        print("Null values in LightConditionID:", accident_details['LightConditionID'].isnull().sum())
+        print("Null values in LightID:", accident_details['LightID'].isnull().sum())
         print("Null values in TrafficControlID:", accident_details['TrafficControlID'].isnull().sum())
         
         # Drop original columns
@@ -243,31 +208,3 @@ class TrafficDataLoader:
         rows = cursor.fetchall()
         return {row[0]: row[1] for row in rows}
 
-
-# Usage
-file_path = 'D:\develop\python\Traffic-Insights\Traffic-Insight\\files\\traffic_collisions_20241122_083125.csv'
-connection_string = (
-    'DRIVER={ODBC Driver 17 for SQL Server};'
-    'SERVER=lp-windows11\DGSQL;'
-    'DATABASE=TrafficInsight_ETL;'
-    'Trusted_Connection=yes;'
-)
-
-if __name__ == "__main__":
-    # For API fetching
-    use_api = False  # Set to False to use a file on disk
-    if use_api:
-        url = "https://services1.arcgis.com/qAo1OsXi67t7XgmS/arcgis/rest/services/Traffic_Collisions/FeatureServer/0/query"
-        params = {"outFields": "*", "where": "1=1", "f": "json"}
-        traffic_data_api = TrafficCollisionsAPI(url=url, params=params)
-        traffic_data_api.fetch_data()
-        csv_path = traffic_data_api.save_to_csv("files")
-        traffic_data_sql = TrafficDataLoader(csv_path, connection_string)
-        traffic_data_sql.load_data()
-    else:
-        traffic_data_sql = TrafficDataLoader(file_path, connection_string)
-        traffic_data_sql.load_data()
-
-    traffic_data_sql.transform_data()
-    traffic_data_sql.load_to_sql()
-    print("All done!")
