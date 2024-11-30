@@ -13,7 +13,8 @@ def traffic_data():
         print('2. By Collision Type')
         print('3. By Road Jurisdiction')
         print('4. By Traffic Condition')
-        print('5. Exit')
+        print('5. Dashboard')
+        print('6. Exit')
 
         choice = input('Enter your choice: ')
 
@@ -62,7 +63,9 @@ def traffic_data():
         
         elif choice=="4":
             bus.plot_accidents_by_traffic_condition()
-        elif choice == '5': 
+        elif choice=="5":
+            bus.create_dashboard()
+        elif choice == '6': 
             break
         else:
             print('Invalid choice. Please try again.')   
