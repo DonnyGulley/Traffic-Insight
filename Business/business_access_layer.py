@@ -19,3 +19,14 @@ class BusinessAccessLayer:
         visualization = Visualization()
         visualization.PlotAccidentsbyImpactType(data, impact_type,impact_type_name)
 
+    def plot_accidents_by_road_jurisdiction(self):
+        self.dal = DataAccessLayer("lp-windows11\DGSQL","TrafficInsight_ETL")
+        data =  self.dal.get_accident_data()
+        visualization = Visualization()
+        visualization.PlotAccidentsbyRoadJurisdiction(data)
+    
+    def plot_accidents_by_traffic_condition(self):
+        self.dal = DataAccessLayer("lp-windows11\DGSQL","TrafficInsight_ETL")
+        data =  self.dal.get_accident_data()
+        visualization = Visualization()
+        visualization.PlotAccidentsbyTrafficControlCondition(data)

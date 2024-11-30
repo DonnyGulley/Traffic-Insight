@@ -11,6 +11,10 @@ def traffic_data():
         print('\nTraffic Collision Data ')    
         print('1. By Date')
         print('2. By Collision Type')
+        print('3. By Road Jurisdiction')
+        print('4. By Traffic Condition')
+        print('5. Exit')
+
         choice = input('Enter your choice: ')
 
         if choice == '1':
@@ -53,7 +57,11 @@ def traffic_data():
             else:
                 print(f"Invalid ID: {impact_type_id}")
  
-
+        elif choice=="3":
+            bus.plot_accidents_by_road_jurisdiction()
+        
+        elif choice=="4":
+            bus.plot_accidents_by_traffic_condition()
         elif choice == '5': 
             break
         else:

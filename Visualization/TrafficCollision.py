@@ -194,3 +194,152 @@ class Visualization:
         plt.show()
 
 
+
+    def PlotAccidentsbyRoadJurisdiction(self, data):
+        if not data:
+            print("No data available")
+            return
+
+        print(f"Data shape: {len(data)}, {len(data[0]) if data else 0}")
+        
+        # Convert pyodbc.Row objects to tuples
+        data_tuples = [tuple(row) for row in data]
+        
+        # Print the first few rows of converted data to inspect its structure
+        print("First few rows of converted data:")
+        for row in data_tuples[:5]:
+            print(row)
+        
+        # Ensure data is a list of tuples
+        if isinstance(data_tuples, list) and all(isinstance(row, tuple) for row in data_tuples):
+            df = pd.DataFrame(data_tuples, columns=[
+                'OBJECTID', 'AccidentNumber', 'AccidentDate', 'AccidentYear', 'AccidentMonth', 'AccidentDay', 
+                'AccidentHour', 'AccidentMinute', 'AccidentSecond', 'AccidentWeekday', 'XCoordinate', 'YCoordinate', 
+                'Longitude', 'Latitude', 'AccidentLocation', 'InitialDirectionOfTravelOne', 'InitialDirectionOfTravelTwo', 
+                'InitialImpactType', 'IntTrafficControl', 'LightID', 'LightForReport', 'RoadJurisdiction', 'TrafficControlID', 
+                'TrafficControlCondition', 'ThruLaneNo', 'NorthboundDisobeyCount', 'SouthboundDisobeyCount', 
+                'PedestrianInvolved', 'CyclistInvolved', 'MotorcyclistInvolved', 'EnvironmentCondition1', 'SelfReported', 
+                'XmlImportNotes', 'LastEditedDate', 'CollisionType', 'ImpactLocation', 'Light', 'ClassificationofAccident', 'ImpactLocationID'
+            ])
+            print(df.head())  # Print the first few rows of the DataFrame for verification
+        else:
+            print("Data is not in the expected format.")
+            return
+
+        # Create subplots
+        fig, axs = plt.subplots(3, 2, figsize=(20, 15))
+
+        # Bar Plot of Accidents by Road Jurisdiction
+        road_jurisdiction_counts = df['RoadJurisdiction'].value_counts()
+        road_jurisdiction_counts.plot(kind='bar', ax=axs[0, 0])
+        axs[0, 0].set_xlabel('Road Jurisdiction')
+        axs[0, 0].set_ylabel('Number of Accidents')
+        axs[0, 0].set_title('Accidents by Road Jurisdiction')
+        axs[0, 0].tick_params(axis='x', rotation=45)
+
+        # Pie Chart of Accidents by Road Jurisdiction
+        road_jurisdiction_counts.plot(kind='pie', autopct='%1.1f%%', ax=axs[0, 1])
+        axs[0, 1].set_title('Accidents by Road Jurisdiction')
+
+        # Heatmap of Accident Locations by Road Jurisdiction
+        sns.heatmap(df.pivot_table(index='YCoordinate', columns='XCoordinate', aggfunc='size', fill_value=0), cmap='viridis', ax=axs[1, 0])
+        axs[1, 0].set_xlabel('X Coordinate')
+        axs[1, 0].set_ylabel('Y Coordinate')
+        axs[1, 0].set_title('Heatmap of Accident Locations by Road Jurisdiction')
+
+        # Box Plot of Accident Severity by Road Jurisdiction
+        if 'ClassificationofAccident' in df.columns:
+            sns.boxplot(x='RoadJurisdiction', y='ClassificationofAccident', data=df, ax=axs[1, 1])
+            axs[1, 1].set_xlabel('Road Jurisdiction')
+            axs[1, 1].set_ylabel('ClassificationofAccident')
+            axs[1, 1].set_title('Accident Severity by Road Jurisdiction')
+        else:
+            axs[1, 1].text(0.5, 0.5, 'AccidentSeverity column not found', horizontalalignment='center', verticalalignment='center', transform=axs[1, 1].transAxes)
+            axs[1, 1].set_title('Accident Severity by Road Jurisdiction')
+
+        # Line Plot of Accidents Over Time by Road Jurisdiction
+        df.set_index('AccidentDate').groupby('RoadJurisdiction').resample('M').size().unstack().plot(ax=axs[2, 0])
+        axs[2, 0].set_xlabel('Date')
+        axs[2, 0].set_ylabel('Number of Accidents')
+        axs[2, 0].set_title('Accidents Over Time by Road Jurisdiction')
+
+        # Hide the empty subplot
+        axs[2, 1].axis('off')
+
+        plt.tight_layout()
+        plt.show()
+
+
+    def PlotAccidentsbyTrafficControlCondition(self, data):
+        if not data:
+            print("No data available")
+            return
+
+        print(f"Data shape: {len(data)}, {len(data[0]) if data else 0}")
+        
+        # Convert pyodbc.Row objects to tuples
+        data_tuples = [tuple(row) for row in data]
+        
+        # Print the first few rows of converted data to inspect its structure
+        print("First few rows of converted data:")
+        for row in data_tuples[:5]:
+            print(row)
+        
+        # Ensure data is a list of tuples
+        if isinstance(data_tuples, list) and all(isinstance(row, tuple) for row in data_tuples):
+            df = pd.DataFrame(data_tuples, columns=[
+                'OBJECTID', 'AccidentNumber', 'AccidentDate', 'AccidentYear', 'AccidentMonth', 'AccidentDay', 
+                'AccidentHour', 'AccidentMinute', 'AccidentSecond', 'AccidentWeekday', 'XCoordinate', 'YCoordinate', 
+                'Longitude', 'Latitude', 'AccidentLocation', 'InitialDirectionOfTravelOne', 'InitialDirectionOfTravelTwo', 
+                'InitialImpactType', 'IntTrafficControl', 'LightID', 'LightForReport', 'RoadJurisdiction', 'TrafficControlID', 
+                'TrafficControlCondition', 'ThruLaneNo', 'NorthboundDisobeyCount', 'SouthboundDisobeyCount', 
+                'PedestrianInvolved', 'CyclistInvolved', 'MotorcyclistInvolved', 'EnvironmentCondition1', 'SelfReported', 
+                'XmlImportNotes', 'LastEditedDate', 'CollisionType', 'ImpactLocation', 'Light', 'ClassificationofAccident', 'ImpactLocationID'
+            ])
+            print(df.head())  # Print the first few rows of the DataFrame for verification
+        else:
+            print("Data is not in the expected format.")
+            return
+
+        # Create subplots
+        fig, axs = plt.subplots(3, 2, figsize=(20, 15))
+
+        # Bar Plot of Accidents by Traffic Control Condition
+        traffic_control_counts = df['TrafficControlCondition'].value_counts()
+        traffic_control_counts.plot(kind='bar', ax=axs[0, 0])
+        axs[0, 0].set_xlabel('Traffic Control Condition')
+        axs[0, 0].set_ylabel('Number of Accidents')
+        axs[0, 0].set_title('Accidents by Traffic Control Condition')
+        axs[0, 0].tick_params(axis='x', rotation=45)
+
+        # Pie Chart of Accidents by Traffic Control Condition
+        traffic_control_counts.plot(kind='pie', autopct='%1.1f%%', ax=axs[0, 1])
+        axs[0, 1].set_title('Accidents by Traffic Control Condition')
+
+        # Heatmap of Accident Locations by Traffic Control Condition
+        sns.heatmap(df.pivot_table(index='YCoordinate', columns='XCoordinate', aggfunc='size', fill_value=0), cmap='viridis', ax=axs[1, 0])
+        axs[1, 0].set_xlabel('X Coordinate')
+        axs[1, 0].set_ylabel('Y Coordinate')
+        axs[1, 0].set_title('Heatmap of Accident Locations by Traffic Control Condition')
+
+        # Box Plot of Accident Severity by Traffic Control Condition
+        if 'ClassificationofAccident' in df.columns:
+            sns.boxplot(x='TrafficControlCondition', y='ClassificationofAccident', data=df, ax=axs[1, 1])
+            axs[1, 1].set_xlabel('Traffic Control Condition')
+            axs[1, 1].set_ylabel('ClassificationofAccident')
+            axs[1, 1].set_title('Accident Severity by Traffic Control Condition')
+        else:
+            axs[1, 1].text(0.5, 0.5, 'AccidentSeverity column not found', horizontalalignment='center', verticalalignment='center', transform=axs[1, 1].transAxes)
+            axs[1, 1].set_title('Accident Severity by Traffic Control Condition')
+
+        # Line Plot of Accidents Over Time by Traffic Control Condition
+        df.set_index('AccidentDate').groupby('TrafficControlCondition').resample('M').size().unstack().plot(ax=axs[2, 0])
+        axs[2, 0].set_xlabel('Date')
+        axs[2, 0].set_ylabel('Number of Accidents')
+        axs[2, 0].set_title('Accidents Over Time by Traffic Control Condition')
+
+        # Hide the empty subplot
+        axs[2, 1].axis('off')
+
+        plt.tight_layout()
+        plt.show()
