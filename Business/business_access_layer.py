@@ -30,3 +30,9 @@ class BusinessAccessLayer:
         data =  self.dal.get_accident_data()
         visualization = Visualization()
         visualization.PlotAccidentsbyTrafficControlCondition(data)
+
+    def create_dashboard(self):
+        self.dal = DataAccessLayer("lp-windows11\DGSQL","TrafficInsight_ETL")
+        data =  self.dal.get_accident_data()
+        visualization = Visualization()
+        visualization.create_dashboard(data)

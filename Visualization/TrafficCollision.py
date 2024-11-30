@@ -343,3 +343,93 @@ class Visualization:
 
         plt.tight_layout()
         plt.show()
+
+    def create_dashboard(self, data):
+        if not data:
+            print("No data available")
+            return
+
+        # Convert pyodbc.Row objects to tuples
+        data_tuples = [tuple(row) for row in data]
+        
+        # Create DataFrame
+        df = pd.DataFrame(data_tuples, columns=[
+            'OBJECTID', 'AccidentNumber', 'AccidentDate', 'AccidentYear', 'AccidentMonth', 'AccidentDay', 
+            'AccidentHour', 'AccidentMinute', 'AccidentSecond', 'AccidentWeekday', 'XCoordinate', 'YCoordinate', 
+            'Longitude', 'Latitude', 'AccidentLocation', 'InitialDirectionOfTravelOne', 'InitialDirectionOfTravelTwo', 
+            'InitialImpactType', 'IntTrafficControl', 'LightID', 'LightForReport', 'RoadJurisdiction', 'TrafficControlID', 
+            'TrafficControlCondition', 'ThruLaneNo', 'NorthboundDisobeyCount', 'SouthboundDisobeyCount', 
+            'PedestrianInvolved', 'CyclistInvolved', 'MotorcyclistInvolved', 'EnvironmentCondition1', 'SelfReported', 
+            'XmlImportNotes', 'LastEditedDate', 'CollisionType', 'ImpactLocation', 'Light', 'ClassificationofAccident', 'ImpactLocationID'
+        ])
+        
+        # Create subplots
+        fig, axs = plt.subplots(5, 2, figsize=(20, 25))
+
+        # Accidents by Date
+        df['AccidentDate'] = pd.to_datetime(df['AccidentDate'])
+        df.set_index('AccidentDate').resample('M').size().plot(ax=axs[0, 0])
+        axs[0, 0].set_xlabel('Date')
+        axs[0, 0].set_ylabel('Number of Accidents')
+        axs[0, 0].set_title('Accidents by Date')
+
+        # Accidents by Impact Type
+        impact_counts = df['ImpactLocationID'].value_counts()
+        impact_counts.plot(kind='bar', ax=axs[0, 1])
+        axs[0, 1].set_xlabel('Impact Type')
+        axs[0, 1].set_ylabel('Number of Accidents')
+        axs[0, 1].set_title('Accidents by Impact Type')
+
+        # Accidents by Road Jurisdiction
+        road_jurisdiction_counts = df['RoadJurisdiction'].value_counts()
+        road_jurisdiction_counts.plot(kind='bar', ax=axs[1, 0])
+        axs[1, 0].set_xlabel('Road Jurisdiction')
+        axs[1, 0].set_ylabel('Number of Accidents')
+        axs[1, 0].set_title('Accidents by Road Jurisdiction')
+
+        # Accidents by Traffic Control Condition
+        traffic_control_counts = df['TrafficControlCondition'].value_counts()
+        traffic_control_counts.plot(kind='bar', ax=axs[1, 1])
+        axs[1, 1].set_xlabel('Traffic Control Condition')
+        axs[1, 1].set_ylabel('Number of Accidents')
+        axs[1, 1].set_title('Accidents by Traffic Control Condition')
+
+        # Heatmap of Accident Locations
+        sns.heatmap(df.pivot_table(index='YCoordinate', columns='XCoordinate', aggfunc='size', fill_value=0), cmap='viridis', ax=axs[2, 0])
+        axs[2, 0].set_xlabel('X Coordinate')
+        axs[2, 0].set_ylabel('Y Coordinate')
+        axs[2, 0].set_title('Heatmap of Accident Locations')
+
+        # Box Plot of Accident Severity by Road Jurisdiction
+        if 'ClassificationofAccident' in df.columns:
+            sns.boxplot(x='RoadJurisdiction', y='ClassificationofAccident', data=df, ax=axs[2, 1])
+            axs[2, 1].set_xlabel('Road Jurisdiction')
+            axs[2, 1].set_ylabel('Accident Severity')
+            axs[2, 1].set_title('Accident Severity by Road Jurisdiction')
+        else:
+            axs[2, 1].text(0.5, 0.5, 'AccidentSeverity column not found', horizontalalignment='center', verticalalignment='center', transform=axs[2, 1].transAxes)
+            axs[2, 1].set_title('Accident Severity by Road Jurisdiction')
+
+        # Accidents Involving Different Participants
+        participant_counts = df[['PedestrianInvolved', 'CyclistInvolved', 'MotorcyclistInvolved']].sum()
+        participant_counts.plot(kind='pie', autopct='%1.1f%%', ax=axs[3, 0])
+        axs[3, 0].set_title('Accidents Involving Different Participants')
+
+        # Accidents Over Time by Road Jurisdiction
+        df.set_index('AccidentDate').groupby('RoadJurisdiction').resample('M').size().unstack().plot(ax=axs[3, 1])
+        axs[3, 1].set_xlabel('Date')
+        axs[3, 1].set_ylabel('Number of Accidents')
+        axs[3, 1].set_title('Accidents Over Time by Road Jurisdiction')
+
+        # Accidents by Collision Type
+        collision_counts = df['CollisionType'].value_counts()
+        collision_counts.plot(kind='bar', ax=axs[4, 0])
+        axs[4, 0].set_xlabel('Collision Type')
+        axs[4, 0].set_ylabel('Number of Accidents')
+        axs[4, 0].set_title('Accidents by Collision Type')
+
+        # Hide the empty subplot
+        axs[4, 1].axis('off')
+
+        plt.tight_layout()
+        plt.show()
