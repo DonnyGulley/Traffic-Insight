@@ -1,19 +1,21 @@
-from Data.OpenData.Traffic_Collisions_Historic_by_AccidentDate_Bars import AccidentDate
-
-
-#data layer - database - fiels -services
+from Data.Databases.TrafficInsight_ETL import crud
+crud = crud
+# Data layer - database - fields - services
 class DataAccessLayer:
-    def __init__(self):
-        pass
-
+    def __init__(self, server, database):
+        self.server = server
+        self.database = database
+        self.connection = None
+        
+        # Get the ETL data for plotting
+        self.etl = crud.TrafficInsightETL(self.server, self.database)
+        self.etl.connect()
 
     def __del__(self):
-        pass
-
+        self.etl.close_connection()
 
     def create_connection(self):
-        pass
+        self.etl.connect()
 
-    ### plotting functions   
-    def PlotAccidentsbyImpactType(self):
-        AccidentDate.Plot()       
+    def get_accident_data(self):
+        return self.etl.get_accident_data()

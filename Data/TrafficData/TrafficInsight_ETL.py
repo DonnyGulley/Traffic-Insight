@@ -11,11 +11,24 @@ if __name__ == "__main__":
     if use_api:
         url = "https://services1.arcgis.com/qAo1OsXi67t7XgmS/arcgis/rest/services/Traffic_Collisions/FeatureServer/0/query"
 
+
+        # Example accident date
+        accident_date = datetime(2022, 7, 1)
+
+        # Format the date as a string in the format 'YYYY-MM-DD'
+        accident_date_str = accident_date.strftime('%Y-%m-%d')
+
         params = {
             "outFields": "*",
-            "where": "1=1",  # This is a universal query to fetch all rows
+            "where": f"AccidentDate >= '{accident_date_str}'",  # Filter to fetch rows with AccidentDate greater than or equal to the specified date
             "f": "json"
         }
+
+        # params = {
+        #     "outFields": "*",
+        #     "where": "1=1",  # This is a universal query to fetch all rows
+        #     "f": "json"
+        # }
        
         traffic_data_api = TrafficCollisionsAPI(url=url, params=params)
         traffic_data_api.fetch_data()
