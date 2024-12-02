@@ -1,0 +1,6 @@
+pandas
+sqlalchemy
+pytest
+pyodbc
+seaborn
+os

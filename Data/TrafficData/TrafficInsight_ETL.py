@@ -2,9 +2,14 @@
 from  TrafficInsightAPI import TrafficCollisionsAPI
 from TrafficInsightDatabase import TrafficDataLoader
 from datetime import datetime
+# Importing the config.py file
+import config  
 
 data_file = "Data\TrafficData\\files\incomming.csv"
-db_connection_string = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=lp-windows11\\DGSQL;DATABASE=TrafficInsight_ETL;Trusted_Connection=yes;'
+
+# Fetch the database connection string from config.py
+db_connection_string = config.DB_CONNECTION_STRING_CollisionETL
+#db_connection_string = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=lp-windows11\\DGSQL;DATABASE=TrafficInsight_ETL;Trusted_Connection=yes;'
 
 if __name__ == "__main__":
     use_api = True  # Set to False to use a file on disk
