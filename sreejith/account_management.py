@@ -107,16 +107,21 @@ def account_management_menu(user_id, username):
         choice = input("Enter your choice: ").strip()
 
         if choice == "1":
+            clear_screen()
             view_account_details(user_id)
             input("\nPress Enter to return to the menu...")
         elif choice == "2":
+            clear_screen()
             update_user_info(user_id)
             input("\nPress Enter to return to the menu...")
         elif choice == "3":
+            clear_screen()
             forgot_password_screen()
         elif choice == "4":  # Change Consent
+            clear_screen()
             change_consent(user_id)
         elif choice == "5":
+            clear_screen()
             confirm = input("\nAre you sure you want to delete your account? Type 'yes' to confirm: ").strip().lower()
             if confirm == "yes":
                 if delete_account(user_id):
