@@ -3,9 +3,13 @@ from TwitterXAPI import TwitterXAPI
 
 import pandas as pd
 import time
+import config
+
+# Fetch the database connection string from config.py
+db_connection_string = config.DB_CONNECTION_STRING_TWITTERXETL
 
 class TwitterTraffic:
-    def __init__(self, bearer_token, db_connection_string, data_file):
+    def __init__(self, bearer_token, data_file):
         self.api = TwitterXAPI(bearer_token)
         self.db = TwitterDatabase(db_connection_string)
         self.data_file = data_file
@@ -60,10 +64,10 @@ class TwitterTraffic:
 
 if __name__ == "__main__":
     bearer_token = "AAAAAAAAAAAAAAAAAAAAACySxAEAAAAArQpbpzVcN%2B%2F6gGkMPv%2Fpv4b2LM8%3DUYSTvRUShoGtKGdKJBR3VwZAAZc3w0lmbQ0ZfBcrH2jSdCTsV3"
-    db_connection_string = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=lp-windows11\\DGSQL;DATABASE=TrafficInsight_Tweets;Trusted_Connection=yes;'
+    
     data_file = r"Data\TwitterXAPI\data\traffic_tweets.csv"
 
-    twitter_traffic = TwitterTraffic(bearer_token, db_connection_string, data_file)
+    twitter_traffic = TwitterTraffic(bearer_token, data_file)
     cities = ["Kitchener", "Waterloo", "Cambrdige", "London"]
 
     tweets = twitter_traffic.get_city_traffic_issues(cities, use_file=False, max_results=10)
