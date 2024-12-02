@@ -1,13 +1,16 @@
 # traffic_data_loader.py
 import pandas as pd
 import pyodbc
+from datetime import datetime
 
+#class used to communicate with the Traffic Insight Collision Repo 
 class TrafficDataLoader:
     def __init__(self, file_path, connection_string):
         self.file_path = file_path
         self.connection_string = connection_string
         self.df = None
 
+    #load data from file - testing
     def load_data(self):
         """Load data from CSV file."""
         print(f"Loading data from file: {self.file_path}")
@@ -84,8 +87,9 @@ class TrafficDataLoader:
 
         print("Data transformation complete.")
 
+    #Insert data into SQL while checking for duplicates.
     def insert_data_to_sql(self, dataframe, table_name, unique_column):
-        #"""Insert data into SQL while checking for duplicates."""
+        
         connection = pyodbc.connect(self.connection_string)
         cursor = connection.cursor()
 
@@ -126,14 +130,12 @@ class TrafficDataLoader:
                 connection.commit()
 
             except Exception as e:
-                print(f"Error executing query for row {row[unique_column]}: {e}")
-
-                        
+                print(f"Error executing query for row {row[unique_column]}: {e}")                       
             
            
-
+    #Load transformed data into SQL tables."""
     def load_to_sql(self):
-        """Load transformed data into SQL tables."""
+        
         connection = pyodbc.connect(self.connection_string)
         cursor = connection.cursor()
 
@@ -165,6 +167,7 @@ class TrafficDataLoader:
         connection.close()
         print("SQL Server connection is closed")
 
+    #transforming
     def map_foreign_keys(self, accident_details):
         """Map foreign keys to the AccidentDetails table."""
         # Use previously inserted data to map the corresponding foreign key IDs
@@ -207,4 +210,20 @@ class TrafficDataLoader:
     
         rows = cursor.fetchall()
         return {row[0]: row[1] for row in rows}
+    
+    def get_last_accident_date(self):
+        # Fetch the accident date from the database
+        with pyodbc.connect(self.connection_string) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT MAX(AccidentDate) FROM [AccidentDetails]")
+            accident_date = cursor.fetchone()[0]
+
+        # Check if accident_date is None and set to default if necessary
+        if accident_date is None:
+            accident_date = datetime(2015, 1, 1, 0, 0, 0)
+
+        # Format the date as a string in the format 'YYYY-MM-DD'
+        return accident_date.strftime('%Y-%m-%d')
+
+
 
