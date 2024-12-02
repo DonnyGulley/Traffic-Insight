@@ -24,12 +24,12 @@ def validate_user(username, password):
             return None  # Username not found
 
     except Exception as e:
-        print(f"Database error: {e}")
+        print(f"Database error occured: {e}")
         return None
     finally:
         conn.close()
 
-
+#insert new user into database
 def register_user(username, password, email, consent):
     """Register a new user in the database."""
     try:
