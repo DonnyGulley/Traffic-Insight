@@ -4,7 +4,7 @@ from db_connection import validate_user
 from forgot_password import forgot_password_screen
 from register import register_screen
 from user_functions import admin_welcome, user_welcome
-import os
+
 
 
 def main_menu():
