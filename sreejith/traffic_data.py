@@ -1,6 +1,13 @@
-from Business.business_access_layer import BusinessAccessLayer
+import os
+import sys
+
+
 from utils import clear_screen
 
+# Add the project root directory to the Python path
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, project_root)
+from Business.business_access_layer import BusinessAccessLayer
 bus = BusinessAccessLayer()   
 
 def traffic_data():
