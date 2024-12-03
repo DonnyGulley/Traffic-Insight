@@ -1,14 +1,5 @@
-
-
-from utils import clear_screen
-import sys
-import os
-
-# Add the parent directory (Traffic-Insight) to the Python path
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(project_root)
-
 from Business.business_access_layer import BusinessAccessLayer
+from utils import clear_screen
 
 bus = BusinessAccessLayer()   
 
