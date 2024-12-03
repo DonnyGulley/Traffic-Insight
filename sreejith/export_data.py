@@ -1,9 +1,36 @@
 import csv
 import os
 import time
-from db_connection import get_user_data, get_bookmarks, get_user_notifications, get_search_history  # Assuming these functions are implemented
+
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+
+def get_user_data(user_id):
+    """Retrieve the user details (basic information)."""
+    # Example query to fetch user data (adjust this to your DB and query setup)
+    query = f"SELECT UserId, username, email FROM [User] WHERE UserId = {user_id}"
+    return execute_query(query)  # This is a placeholder function for DB query execution
+
+def get_bookmarks(user_id):
+    """Retrieve the user's bookmarks."""
+    query = f"SELECT Route, DateAdded FROM Bookmarks WHERE UserId = {user_id}"
+    return execute_query(query)
+
+def get_notifications(user_id):
+    """Retrieve the user's notifications."""
+    query = f"SELECT Message, DateAdded FROM Notifications WHERE UserId = {user_id}"
+    return execute_query(query)
+
+def get_search_history(user_id):
+    """Retrieve the user's search history."""
+    query = f"SELECT SearchHistoryId FROM SearchHistory WHERE UserId = {user_id}"
+    return execute_query(query)
+
+def execute_query(query):
+    """Execute a database query and return the result."""
+    # Assuming you are using pyodbc or a similar library to connect to the database
+    # You would write the actual code to execute the query here and fetch results
+    return []
 
 def export_to_csv(user_id, username):
     """Export user data to a CSV file."""
@@ -11,7 +38,7 @@ def export_to_csv(user_id, username):
         # Fetch user data
         user_data = get_user_data(user_id)
         bookmarks = get_bookmarks(user_id)
-        notifications = get_user_notifications(user_id)
+        notifications = get_notifications(user_id)
         search_history = get_search_history(user_id)
 
         if not user_data:
@@ -28,18 +55,19 @@ def export_to_csv(user_id, username):
             writer = csv.writer(file)
             
             # Write the header (adjust columns based on your data structure)
-            writer.writerow(["UserId", "Username", "Email", "Route", "Bookmark Date", "Notification Message", "Notification Date", "Search History ID"])
+            writer.writerow(["UserId", "Username", "Email", "Route", "Bookmark Date", "Notification Message", "Notification Date", "Search History"])
             
-            # Iterate through each set of data and write it to the CSV
+            # Write user data and related data
             for bookmark, notification, search in zip(bookmarks, notifications, search_history):
-                writer.writerow([user_data[0],  # UserId
-                                 user_data[1],  # Username
-                                 user_data[2],  # Email
-                                 bookmark[0],   # Route
-                                 bookmark[1],   # DateAdded
-                                 notification[0],  # Message
-                                 notification[1],  # DateAdded
-                                 search[0]        # SearchHistoryId
+                writer.writerow([
+                    user_data[0],  # UserId
+                    user_data[1],  # Username
+                    user_data[2],  # Email
+                    bookmark[0],   # Route
+                    bookmark[1],   # DateAdded
+                    notification[0],  # Message
+                    notification[1],  # DateAdded
+                    search[0]        # SearchHistoryId
                 ])
         
         print(f"Data exported successfully to {file_path}")
@@ -56,7 +84,7 @@ def export_to_pdf(user_id, username):
         # Fetch user data
         user_data = get_user_data(user_id)
         bookmarks = get_bookmarks(user_id)
-        notifications = get_user_notifications(user_id)
+        notifications = get_notifications(user_id)
         search_history = get_search_history(user_id)
 
         if not user_data:
