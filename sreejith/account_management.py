@@ -3,6 +3,7 @@ from forgot_password import forgot_password_screen
 from db_connection import connection_string
 from consent import update_consent, get_current_consent
 from utils import clear_screen
+from notification import send_notification
 
 
 def view_account_details(user_id):
@@ -45,6 +46,9 @@ def update_user_info(user_id):
         conn.commit()
         print("\nYour account information has been updated successfully.")
         conn.close()
+
+        # Notify the user
+        send_notification(user_id, "Your account information was updated.")
     except pyodbc.Error as e:
         print(f"\nDatabase error: {e}")
 
@@ -67,10 +71,12 @@ def change_consent(user_id):
 
     if update_consent(user_id, consent):
         print("\nYour consent preference has been updated successfully.")
+        send_notification(user_id, "Your consent preference was updated.")
     else:
         print("\nError updating your consent preference. Please try again.")
     
     input("\nPress Enter to return to the menu...")
+
 
 
 def delete_account(user_id):
