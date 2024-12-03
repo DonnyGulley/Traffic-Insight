@@ -1,36 +1,13 @@
 import csv
 import os
 import time
+from db_connection import get_user_data, get_bookmarks, get_notification, get_search_history  # Import the new function
 
+from reportlab.lib.pagesizes import letter
+from notification import view_notifications
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
-def get_user_data(user_id):
-    """Retrieve the user details (basic information)."""
-    # Example query to fetch user data (adjust this to your DB and query setup)
-    query = f"SELECT UserId, username, email FROM [User] WHERE UserId = {user_id}"
-    return execute_query(query)  # This is a placeholder function for DB query execution
-
-def get_bookmarks(user_id):
-    """Retrieve the user's bookmarks."""
-    query = f"SELECT Route, DateAdded FROM Bookmarks WHERE UserId = {user_id}"
-    return execute_query(query)
-
-def get_notifications(user_id):
-    """Retrieve the user's notifications."""
-    query = f"SELECT Message, DateAdded FROM Notifications WHERE UserId = {user_id}"
-    return execute_query(query)
-
-def get_search_history(user_id):
-    """Retrieve the user's search history."""
-    query = f"SELECT SearchHistoryId FROM SearchHistory WHERE UserId = {user_id}"
-    return execute_query(query)
-
-def execute_query(query):
-    """Execute a database query and return the result."""
-    # Assuming you are using pyodbc or a similar library to connect to the database
-    # You would write the actual code to execute the query here and fetch results
-    return []
 
 def export_to_csv(user_id, username):
     """Export user data to a CSV file."""
@@ -38,7 +15,7 @@ def export_to_csv(user_id, username):
         # Fetch user data
         user_data = get_user_data(user_id)
         bookmarks = get_bookmarks(user_id)
-        notifications = get_notifications(user_id)
+        notifications = get_notification(username)
         search_history = get_search_history(user_id)
 
         if not user_data:
@@ -84,7 +61,7 @@ def export_to_pdf(user_id, username):
         # Fetch user data
         user_data = get_user_data(user_id)
         bookmarks = get_bookmarks(user_id)
-        notifications = get_notifications(user_id)
+        notifications = get_notification(user_id)
         search_history = get_search_history(user_id)
 
         if not user_data:
@@ -139,6 +116,7 @@ def export_data(user_id, username):
         print("1. Export My Data to CSV")
         print("2. Export My Data to PDF")
         print("3. Return to the User Menu")
+        print("UserID:",user_id)
         choice = input("Enter your choice: ").strip()
         
         if choice == "1":
