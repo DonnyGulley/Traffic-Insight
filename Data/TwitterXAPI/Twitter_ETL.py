@@ -3,6 +3,10 @@ from TwitterXAPI import TwitterXAPI
 
 import pandas as pd
 import time
+import sys 
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 import config
 
 # Fetch the database connection string from config.py
