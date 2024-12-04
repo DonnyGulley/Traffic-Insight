@@ -3,3 +3,4 @@ sqlalchemy
 pytest
 pyodbc
 seaborn
+pymysql
