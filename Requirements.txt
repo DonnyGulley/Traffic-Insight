@@ -1,5 +1,6 @@
 pandas
 sqlalchemy
 pytest
-pyodbc
 seaborn
+pyodbc
+pymysql

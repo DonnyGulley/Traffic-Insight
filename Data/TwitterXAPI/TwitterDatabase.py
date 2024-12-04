@@ -1,30 +1,30 @@
-import pyodbc
 import pandas as pd
 
 class TwitterDatabase:
-    def __init__(self, db_connection_string):
-        self.db_connection_string = db_connection_string
-        self.conn = self.create_connection()
-
-    def create_connection(self):
-        try:
-            conn = pyodbc.connect(self.db_connection_string)
-            print("Connection to SQL Server successful")
-            return conn
-        except pyodbc.Error as e:
-            print(f"Error connecting to SQL Server: {e}")
-            return None
+    def __init__(self, db_connection, db_driver):
+        self.db_connection = db_connection     
+        self.db_driver = db_driver
+    
     #used in the filter to keep moving forward
     def get_last_tweet_id(self):
         try:
-            cursor = self.conn.cursor()
-            cursor.execute("SELECT MAX(TweetID) FROM Tweets")
-            last_tweet_id = cursor.fetchone()[0]
-            cursor.close()
+            with self.db_connection.cursor() as cursor:
+                cursor.execute("SELECT MAX(TweetID) FROM Tweets")
+                last_tweet_id = cursor.fetchone()[0]
+                
             return last_tweet_id
-        except pyodbc.Error as e:
+        except Exception as e:
             print(f"Error fetching last tweet ID: {e}")
             return None
+    
+    #Helper function for switching between mssql and mysql        
+    def format_query( self, query):
+        if self.db_driver == 'pyodbc':
+            return query.replace('%s', '?')
+        elif self.db_driver == 'pymysql':
+            return query
+        else:
+            raise ValueError("Unsupported database driver")
 
     def store_tweets(self, tweets):
         cursor = None
@@ -35,25 +35,28 @@ class TwitterDatabase:
                 "CreatedAt": [tweet['CreatedAt'] for tweet in tweets]
             }
             df = pd.DataFrame(data)
-
+            df['CreatedAt'] = pd.to_datetime(df['CreatedAt'])
+            
             # Insert tweets into the database
-            cursor = self.conn.cursor()
+            cursor = self.db_connection.cursor()
             for _, row in df.iterrows():
-                cursor.execute("SELECT COUNT(*) FROM Tweets WHERE TweetID = ?", row.TweetID)
+                check_query = self.format_query("SELECT COUNT(*) FROM Tweets WHERE TweetID = %s")
+                cursor.execute(check_query, (row.TweetID,))
                 if cursor.fetchone()[0] == 0:  # No record found
-                    cursor.execute("""
+                    insert_query = self.format_query("""
                         INSERT INTO Tweets (TweetID, TweetText, CreatedAt)
-                        VALUES (?, ?, ?)
-                    """, row.TweetID, row.TweetText, row.CreatedAt)
+                        VALUES (%s, %s, %s)
+                    """)
+                    cursor.execute(insert_query, (row.TweetID, row.TweetText, row.CreatedAt))
                     print(f"New tweet inserted: {row.TweetID}")
                 else:
                     print(f"Duplicate tweet found, skipping: {row.TweetID}")
 
-            self.conn.commit()
+            self.db_connection.commit()
 
-        except pyodbc.Error as e:
+        except Exception as e:
             print(f"Error storing tweets: {e}")
-            self.conn.rollback()
+            self.db_connection.rollback()
         finally:
             if cursor:
                 cursor.close()
