@@ -31,23 +31,21 @@ class TwitterTraffic:
         
         self.api = TwitterXAPI(bearer_token)
         self.db = TwitterDatabase(connection, config.DB_DRIVER)
-        self.data_file = data_file
-
-    def clean_tweet_text(self, tweet_text):
-
-        pass
+        self.data_file = data_file  
 
     def get_city_traffic_issues(self, cities, use_file=False, max_results=10):
-        if config.Use_API:
-            #save stream to file 
+        if config.Use_API == False:
+            #load save data from file
             print(f"Loading data from file: {self.data_file}")
             df = pd.read_csv(self.data_file)
         else:
+            #call twitter api
             all_tweets = []
+            #get the last id so we can set it in the call
             last_tweet_id = self.db.get_last_tweet_id()
             tweet_count = 0
             retries = 0
-
+            #chunks of 10
             while tweet_count < max_results:
                 #setup keywords for a query into twitter x
                 #query = 'kitchener (collision OR "car accident" OR "construction delays" OR "icy road" OR "drive home") lang:en -is:retweet -is:reply'                

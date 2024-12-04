@@ -8,16 +8,16 @@ DB_CONNECTION_STRING_TRAFFICINSIGHT = 'DRIVER={ODBC Driver 17 for SQL Server};SE
 
 
 DB_CONNECTION_STRING_Collision_MySQL_ETL = {
-    'host': 'trafficinsight.mysql.pythonanywhere-services.com;',
-    'user': 'trafficinsight;',
-    'password': 'Passwords4Passwords2024!;',
-    'database': 'trafficinsight$TrafficInsight_ETL;'
+    'host': 'trafficinsight.mysql.pythonanywhere-services.com',
+    'user': 'trafficinsight',
+    'password': 'Passwords4Passwords2024!',
+    'database': 'trafficinsight$TrafficInsight_ETL'
 }
 DB_CONNECTION_STRING_TwitterX_MySQL_ETL = {
-    'host': 'trafficinsight.mysql.pythonanywhere-services.com;',
-    'user': 'trafficinsight;',
-    'password': 'Passwords4Passwords2024!;',
-    'database': 'trafficinsight$TrafficInsight_Tweets;'
+    'host': 'trafficinsight.mysql.pythonanywhere-services.com',
+    'user': 'trafficinsight',
+    'password': 'Passwords4Passwords2024!',
+    'database': 'trafficinsight$TrafficInsight_Tweets'
 }
 # Set the database driver based on the environment
 DB_DRIVER = 'pyodbc'
