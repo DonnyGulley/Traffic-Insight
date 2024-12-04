@@ -14,7 +14,7 @@ if __name__ == "__main__":
         import config
         data_file = "Data\\TrafficData\\files\\incoming.csv"
         # Fetch the database connection string from config.py
-
+        connection=None
         if config.DB_DRIVER == 'pyodbc':
             db_connection_string = config.DB_CONNECTION_STRING_Collision_MyODBC_ETL
             connection = pyodbc.connect(db_connection_string)
