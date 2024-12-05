@@ -3,7 +3,6 @@ import os
 import pymysql
 import pyodbc
 
-
 from TrafficInsightAPI import TrafficCollisionsAPI
 from TrafficInsightDatabase import TrafficDataLoader
 

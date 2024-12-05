@@ -23,7 +23,7 @@ class TrafficDataLoader:
     def column_mapping(self):
         """Define column mapping for renaming."""
         return {
-             'ACCIDENTNUM': 'AccidentNumber',
+            'ACCIDENTNUM': 'AccidentNumber',
             'ACCIDENTDATE': 'AccidentDate',
             'ACCIDENT_YEAR': 'AccidentYear',
             'ACCIDENT_MONTH': 'AccidentMonth',
@@ -64,7 +64,7 @@ class TrafficDataLoader:
     
     #Transform data into correct format.
     def transform_data(self):
-       
+    
         print("Transforming data...")
 
         # Get column mapping and rename columns
@@ -99,6 +99,50 @@ class TrafficDataLoader:
 
 
     def insert_data_to_sql(self, dataframe, table_name, unique_column):
+        
+        connection = pyodbc.connect(self.connection_string)
+        cursor = connection.cursor()
+
+        print(dataframe.columns)
+
+        # Ensure the unique_column exists in the dataframe
+        if unique_column not in dataframe.columns:
+            print(f"Error: '{unique_column}' not found in the dataframe columns.")
+            return
+
+        # Create a query to check if the record already exists
+        check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {unique_column} = ?"
+
+        # Prepare the insert query (done once)
+        placeholders = ', '.join(['?'] * len(dataframe.columns))
+        columns = ', '.join(dataframe.columns)
+        sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+
+        # Iterate over each row in the dataframe
+        for _, row in dataframe.iterrows():
+
+            # Check if the value for the unique column is valid (not None or empty)
+            unique_value = row[unique_column]
+            if unique_value is None or pd.isna(unique_value):
+                print(f"Skipping row with invalid unique column value: {unique_value}")
+                continue  # Skip this row if the unique column value is invalid
+
+            try:
+                # Execute the check query to see if the record already exists
+                cursor.execute(check_query, (unique_value,))
+                records_exists = cursor.fetchone()[0] > 0
+                
+                if not records_exists:  # If the record does not exist, insert it
+                    cursor.execute(sql, tuple(row))
+                    print(f"New record inserted: {row[unique_column]}")
+
+                # Commit the transaction
+                connection.commit()
+
+            except Exception as e:
+                print(f"Error executing query for row {row[unique_column]}: {e}")                       
+            
+        
         with self.db_connection.cursor() as cursor:
             print(dataframe.columns)
 
@@ -201,8 +245,8 @@ class TrafficDataLoader:
         
         # Drop original columns
         return accident_details.drop(columns=['COLLISIONTYPE', 'CLASSIFICATIONOFACCIDENT', 
-                                              'IMPACTLOCATION', 'LIGHT', 'TRAFFICCONTROL'])
- 
+                                            'IMPACTLOCATION', 'LIGHT', 'TRAFFICCONTROL'])
+
     #Get a dictionary of {value: ID} mapping for lookup tables."""
     def get_id_map(self, table_name, column_name):   
 
