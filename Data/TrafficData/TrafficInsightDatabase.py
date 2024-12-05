@@ -1,18 +1,17 @@
 # traffic_data_loader.py
 import pandas as pd
-import pyodbc
 from datetime import datetime
 
 #class used to communicate with the Traffic Insight Collision Repo 
 class TrafficDataLoader:
-    def __init__(self, file_path, connection_string):
+    def __init__(self, file_path, db_connection, db_driver):
         self.file_path = file_path
-        self.connection_string = connection_string
+        self.db_connection = db_connection
         self.df = None
+        self.db_driver = db_driver
 
     #load data from file - testing
-    def load_data(self):
-        """Load data from CSV file."""
+    def load_data(self):        
         print(f"Loading data from file: {self.file_path}")
         
         self.df = pd.read_csv(self.file_path)
@@ -20,6 +19,7 @@ class TrafficDataLoader:
         print("Data loaded into DataFrame.")
         print("Columns in DataFrame:", self.df.columns)
 
+    #Transforming 
     def column_mapping(self):
         """Define column mapping for renaming."""
         return {
@@ -61,9 +61,10 @@ class TrafficDataLoader:
             'LASTEDITEDDATE': 'LastEditedDate'
             
         }
-
+    
+    #Transform data into correct format.
     def transform_data(self):
-        """Transform data into correct format."""
+    
         print("Transforming data...")
 
         # Get column mapping and rename columns
@@ -86,8 +87,17 @@ class TrafficDataLoader:
         self.df.drop(['ENVIRONMENTCONDITION2', 'CREATE_BY', 'CREATE_DATE'], axis=1, inplace=True)
 
         print("Data transformation complete.")
+    
+    #Helper function for switching between mssql and mysql        
+    def format_query( self, query, driver):
+        if driver == 'pyodbc':
+            return query.replace('%s', '?')
+        elif driver == 'pymysql':
+            return query
+        else:
+            raise ValueError("Unsupported database driver")
 
-    #Insert data into SQL while checking for duplicates.
+
     def insert_data_to_sql(self, dataframe, table_name, unique_column):
         
         connection = pyodbc.connect(self.connection_string)
@@ -133,11 +143,49 @@ class TrafficDataLoader:
                 print(f"Error executing query for row {row[unique_column]}: {e}")                       
             
         
+        with self.db_connection.cursor() as cursor:
+            print(dataframe.columns)
+
+            # Ensure the unique_column exists in the dataframe
+            if unique_column not in dataframe.columns:
+                print(f"Error: '{unique_column}' not found in the dataframe columns.")
+                return
+
+            # Create a query to check if the record already exists
+            check_query = f"SELECT COUNT(*) FROM {table_name} WHERE {unique_column} = %s"
+            check_query = self.format_query(check_query, self.db_driver)
+
+            # Prepare the insert query (done once)
+            placeholders = ', '.join(['%s'] * len(dataframe.columns))
+            columns = ', '.join(dataframe.columns)
+            sql = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+            sql = self.format_query(sql, self.db_driver)
+
+            # Iterate over each row in the dataframe
+            for _, row in dataframe.iterrows():
+                # Check if the value for the unique column is valid (not None or empty)
+                unique_value = row[unique_column]
+                if unique_value is None or pd.isna(unique_value):
+                    print(f"Skipping row with invalid unique column value: {unique_value}")
+                    continue  # Skip this row if the unique column value is invalid
+
+                try:
+                    # Execute the check query to see if the record already exists
+                    cursor.execute(check_query, (unique_value,))
+                    records_exists = cursor.fetchone()[0] > 0
+
+                    if not records_exists:  # If the record does not exist, insert it
+                        cursor.execute(sql, tuple(row))
+                        print(f"New record inserted: {row[unique_column]}")
+
+                except Exception as e:
+                    print(f"Error executing query for row {row[unique_column]}: {e}")
+
+            # Commit the transaction
+            self.db_connection.commit()            
+           
     #Load transformed data into SQL tables."""
-    def load_to_sql(self):
-        
-        connection = pyodbc.connect(self.connection_string)
-        cursor = connection.cursor()
+    def load_to_sql(self):     
 
         # Step 1: Insert data into CollisionTypes table
         collision_types = self.df[['COLLISIONTYPE']].drop_duplicates().reset_index(drop=True)
@@ -164,12 +212,10 @@ class TrafficDataLoader:
         # Step 5: Insert AccidentDetails data
         self.insert_data_to_sql(accident_details, 'AccidentDetails', 'OBJECTID')
 
-        connection.close()
-        print("SQL Server connection is closed")
 
-    #transforming
+    #transforming - Map foreign keys to the AccidentDetails table.
     def map_foreign_keys(self, accident_details):
-        """Map foreign keys to the AccidentDetails table."""
+     
         # Use previously inserted data to map the corresponding foreign key IDs
         collision_type_map = self.get_id_map('CollisionTypes', 'COLLISIONTYPE')
         classification_map = self.get_id_map('ClassificationofAccident', 'ClassificationofAccident')
@@ -201,21 +247,21 @@ class TrafficDataLoader:
         return accident_details.drop(columns=['COLLISIONTYPE', 'CLASSIFICATIONOFACCIDENT', 
                                             'IMPACTLOCATION', 'LIGHT', 'TRAFFICCONTROL'])
 
-    def get_id_map(self, table_name, column_name):
-        """Get a dictionary of {value: ID} mapping for lookup tables."""
-        connection = pyodbc.connect(self.connection_string)
-        cursor = connection.cursor()
-        columnID = column_name  + "Id"
-        cursor.execute(f"SELECT {column_name}, {columnID}   FROM {table_name}")
-    
-        rows = cursor.fetchall()
+    #Get a dictionary of {value: ID} mapping for lookup tables."""
+    def get_id_map(self, table_name, column_name):   
+
+        with self.db_connection.cursor() as cursor:
+            column_id = column_name + "Id"
+            query = f"SELECT {column_name}, {column_id} FROM {table_name}"
+            cursor.execute(query)
+            rows = cursor.fetchall()
         return {row[0]: row[1] for row in rows}
     
-    def get_last_accident_date(self):
-        # Fetch the accident date from the database
-        with pyodbc.connect(self.connection_string) as conn:
-            cursor = conn.cursor()
-            cursor.execute("SELECT MAX(AccidentDate) FROM [AccidentDetails]")
+    # Fetch the accident date from the database
+    def get_last_accident_date(self):       
+       
+        with self.db_connection.cursor() as cursor:          
+            cursor.execute("SELECT MAX(AccidentDate) FROM AccidentDetails")
             accident_date = cursor.fetchone()[0]
 
         # Check if accident_date is None and set to default if necessary
@@ -224,6 +270,6 @@ class TrafficDataLoader:
 
         # Format the date as a string in the format 'YYYY-MM-DD'
         return accident_date.strftime('%Y-%m-%d')
-
-
+     
+    
 

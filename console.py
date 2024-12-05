@@ -1,6 +1,6 @@
 from Business.business_access_layer import BusinessAccessLayer
 from Data.data_access_layer import DataAccessLayer
-from Data.Databases.Script.db_intialize import get_db
+from Data.Databases.Scripts.db_intialize import get_db
 from threading import Thread
 from time import sleep
 
