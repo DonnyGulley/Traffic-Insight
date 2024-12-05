@@ -23,7 +23,7 @@ class TrafficDataLoader:
     def column_mapping(self):
         """Define column mapping for renaming."""
         return {
-             'ACCIDENTNUM': 'AccidentNumber',
+            'ACCIDENTNUM': 'AccidentNumber',
             'ACCIDENTDATE': 'AccidentDate',
             'ACCIDENT_YEAR': 'AccidentYear',
             'ACCIDENT_MONTH': 'AccidentMonth',
@@ -132,7 +132,7 @@ class TrafficDataLoader:
             except Exception as e:
                 print(f"Error executing query for row {row[unique_column]}: {e}")                       
             
-           
+        
     #Load transformed data into SQL tables."""
     def load_to_sql(self):
         
@@ -199,7 +199,7 @@ class TrafficDataLoader:
         
         # Drop original columns
         return accident_details.drop(columns=['COLLISIONTYPE', 'CLASSIFICATIONOFACCIDENT', 
-                                              'IMPACTLOCATION', 'LIGHT', 'TRAFFICCONTROL'])
+                                            'IMPACTLOCATION', 'LIGHT', 'TRAFFICCONTROL'])
 
     def get_id_map(self, table_name, column_name):
         """Get a dictionary of {value: ID} mapping for lookup tables."""
