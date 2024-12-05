@@ -51,7 +51,7 @@ class Visualization:
         # Plot accidents by date
         accident_dates = filtered_df['AccidentDate'].tolist()
         date_counts = {date: accident_dates.count(date) for date in set(accident_dates)}
-      
+    
         # Create subplots
         fig, axs = plt.subplots(3, 2, figsize=(15, 15))
 
@@ -77,7 +77,7 @@ class Visualization:
         axs[1, 0].set_xlabel('Hour of the Day')
         axs[1, 0].set_ylabel('Number of Accidents')
         axs[1, 0].set_title('Accidents by Hour of the Day')
-       
+    
 
         # Plot accidents involving different participants
         participant_counts = df[['PedestrianInvolved', 'CyclistInvolved', 'MotorcyclistInvolved']].sum()
@@ -279,6 +279,16 @@ class Visualization:
         
         # Convert pyodbc.Row objects to tuples
         data_tuples = [tuple(row) for row in data]
+        row_lengths = [len(row) for row in data_tuples]
+        print("Row lengths in data_tuples:", set(row_lengths))
+        
+        # Filter rows with correct length
+        expected_length = 37
+        data_tuples = [row for row in data_tuples if len(row) == expected_length]
+
+        if not data_tuples:
+            print(f"No rows with expected length ({expected_length}) found.")
+            return
         
         # Print the first few rows of converted data to inspect its structure
         print("First few rows of converted data:")
@@ -294,7 +304,8 @@ class Visualization:
                 'InitialImpactType', 'IntTrafficControl', 'LightID', 'LightForReport', 'RoadJurisdiction', 'TrafficControlID', 
                 'TrafficControlCondition', 'ThruLaneNo', 'NorthboundDisobeyCount', 'SouthboundDisobeyCount', 
                 'PedestrianInvolved', 'CyclistInvolved', 'MotorcyclistInvolved', 'EnvironmentCondition1', 'SelfReported', 
-                'XmlImportNotes', 'LastEditedDate', 'CollisionType', 'ImpactLocation', 'Light', 'ClassificationofAccident', 'ImpactLocationID'
+                'XmlImportNotes', 'LastEditedDate', 'CollisionType', 'ImpactLocation', 'Light', 'ClassificationofAccident', 
+                'ImpactLocationID'
             ])
             print(df.head())  # Print the first few rows of the DataFrame for verification
         else:

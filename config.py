@@ -7,6 +7,17 @@ DB_CONNECTION_STRING_Collision_MyODBC_ETL ='DRIVER={ODBC Driver 17 for SQL Serve
 DB_CONNECTION_STRING_TRAFFICINSIGHT = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=lp-windows11\\DGSQL;DATABASE=TrafficInsight;Trusted_Connection=yes;'
 
 
+# Other configurations can be added here
+
+
+# # Database configuration
+# DB_CONNECTION_STRING_TWITTERXETL = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=OBIORA\\INSTANCE_ONE_SQL;DATABASE=TrafficInsight_Tweets;Trusted_Connection=yes;'
+# DB_CONNECTION_STRING_CollisionETL ='DRIVER={ODBC Driver 17 for SQL Server};SERVER=OBIORA\\INSTANCE_ONE_SQL;DATABASE=TrafficInsight_ETL;Trusted_Connection=yes;'
+# DB_CONNECTION_STRING_TRAFFICINSIGHT = 'DRIVER={ODBC Driver 17 for SQL Server};SERVER=OBIORA\\INSTANCE_ONE_SQL;DATABASE=TrafficInsight;Trusted_Connection=yes;'
+
+# # Other configurations can be added here
+
+
 DB_CONNECTION_STRING_Collision_MySQL_ETL = {
     'host': 'trafficinsight.mysql.pythonanywhere-services.com',
     'user': 'trafficinsight',
@@ -23,3 +34,4 @@ DB_CONNECTION_STRING_TwitterX_MySQL_ETL = {
 DB_DRIVER = 'pyodbc'
 #development use only
 Use_API = True
+
