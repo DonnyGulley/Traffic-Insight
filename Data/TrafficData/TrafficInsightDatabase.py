@@ -13,7 +13,7 @@ class TrafficInsightDatabase:
         print("Initialized TrafficDataLoader with file_path, db_connectionion and db_diver and parameters.")
 
     #load data from file - testing
-    def load_data(self, dfAPI):        
+    def load_data_from_df(self, dfAPI):        
         print(f"Loading data from file: {self.file_path}")
         
         self.df = dfAPI
@@ -21,6 +21,14 @@ class TrafficInsightDatabase:
         print("Data loaded into DataFrame.")
         print("Columns in DataFrame:", self.df.columns)
 
+    def load_data_from_file(self, file_path):        
+        """Load data from CSV file."""
+        print(f"Loading data from file: {self.file_path}")
+        
+        self.df = pd.read_csv(self.file_path)
+        
+        print("Data loaded into DataFrame.")
+        print("Columns in DataFrame:", self.df.columns)
     #Transforming 
     def column_mapping(self):
         """Define column mapping for renaming."""

@@ -12,7 +12,18 @@ if __name__ == "__main__":
         sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
         import config
         
-        data_file = "\\files\\incoming.csv"
+        import os
+
+        # Get the current working directory
+        project_root = os.getcwd()
+
+        # Construct the relative path to the directory
+        data_directory = os.path.join(project_root, 'Data\\TrafficData\\files')
+
+        print(data_directory)
+
+
+        data_file = os.path.join(data_directory, "incoming.csv")
         # Fetch the database connection string from config.py based on dev or prd
         connection=None
         if config.DB_DRIVER == 'pyodbc':
@@ -52,12 +63,12 @@ if __name__ == "__main__":
             traffic_data_api.fetch_data()
             
             #save incoming api data to file for backup
-            csv_path = traffic_data_api.save_to_csv(data_file)
+            csv_path = traffic_data_api.save_to_csv(data_directory)
           
-            traffic_data_sql.load_data(traffic_data_api.df)
+            traffic_data_sql.load_data_from_df(traffic_data_api.df)
         else:
-            # Use file
-            traffic_data_sql.load_data()
+            # Use file, create a incoming file from a api datafile backup
+            traffic_data_sql.load_data_from_file(data_file)
 
         traffic_data_sql.transform_data()
         traffic_data_sql.load_to_sql()
