@@ -4,15 +4,16 @@ import pymysql
 import pyodbc
 
 from TrafficInsightAPI import TrafficCollisionsAPI
-from TrafficInsightDatabase import TrafficDataLoader
+from TrafficInsightDatabase import TrafficInsightDatabase
 
 if __name__ == "__main__":
-    # Set to False to use a file on disk    
+   
     try:
         sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
         import config
-        data_file = "Data\\TrafficData\\files\\incoming.csv"
-        # Fetch the database connection string from config.py
+        
+        data_file = "\\files\\incoming.csv"
+        # Fetch the database connection string from config.py based on dev or prd
         connection=None
         if config.DB_DRIVER == 'pyodbc':
             db_connection_string = config.DB_CONNECTION_STRING_Collision_MyODBC_ETL
@@ -29,10 +30,11 @@ if __name__ == "__main__":
         else:
             raise ValueError("Unsupported database driver")
 
-        traffic_data_sql = TrafficDataLoader(data_file, connection, config.DB_DRIVER)
+        #create instance of the database class 
+        traffic_data_sql = TrafficInsightDatabase(data_file, connection, config.DB_DRIVER)
     
         if config.Use_API:
-            url = "https://services1.arcgis.com/qAo1OsXi67t7XgmS/arcgis/rest/services/Traffic_Collisions/FeatureServer/0/query"
+            url = config.API_Collision_URL
 
             # Fetch the last available accident date from the database
             accident_date = traffic_data_sql.get_last_accident_date()
@@ -44,11 +46,15 @@ if __name__ == "__main__":
                 "f": "json"
             }
 
+            #Create instance of API class
             traffic_data_api = TrafficCollisionsAPI(url=url, params=params)
+
             traffic_data_api.fetch_data()
+            
+            #save incoming api data to file for backup
             csv_path = traffic_data_api.save_to_csv(data_file)
-            traffic_data_sql = TrafficDataLoader(csv_path, connection, config.DB_DRIVER)
-            traffic_data_sql.load_data()
+          
+            traffic_data_sql.load_data(traffic_data_api.df)
         else:
             # Use file
             traffic_data_sql.load_data()
