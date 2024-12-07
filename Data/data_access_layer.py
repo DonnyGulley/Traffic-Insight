@@ -1,4 +1,4 @@
-from Data.Databases.TrafficInsight_ETL import crud
+from Data.TrafficData.TrafficInsight_ETL_CRUD import crud
 from Data.Databases.feedback import Feedback
 import pyodbc
 import json
