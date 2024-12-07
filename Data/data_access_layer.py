@@ -9,6 +9,7 @@ crudETL = TrafficInsight_ETL_CRUD
 
 CACHE_FILE_PATH = os.path.join(os.path.dirname(__file__), "cached_accidents.json")
 # Data layer - database - fields - services
+#Traffic Insight and Traffic Insight ETL
 class DataAccessLayer:
     def __init__(self, server, database):
     # def __init__(self, server="OBIORA\\INSTANCE_ONE_SQL", database="TrafficInsight_ETL"):
@@ -87,7 +88,7 @@ class DataAccessLayer:
         query = """
         INSERT INTO ActivityLogs (Action, Details) VALUES (?, ?)
         """
-        connection = self.etl.get_connection()
+        connection = self.get_connection()
         cursor = connection.cursor()
         try:
             cursor.execute(query, (action, details))
