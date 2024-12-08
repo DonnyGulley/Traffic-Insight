@@ -1,6 +1,6 @@
 import sys 
 import os
-import pymysql
+import pymysql # type: ignore
 import pyodbc
 
 from TrafficInsightAPI import TrafficCollisionsAPI

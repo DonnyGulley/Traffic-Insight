@@ -6,8 +6,8 @@ dal = DataAccessLayer
 
 class BusinessAccessLayer:
     def __init__(self):
-        # server = os.getenv("DB_SERVER", "OBIORA\\INSTANCE_ONE_SQL")
-        server = os.getenv("DB_SERVER", "lp-windows11\\DGSQ")
+        server = os.getenv("DB_SERVER", "OBIORA\\INSTANCE_ONE_SQL")
+        # server = os.getenv("DB_SERVER", "lp-windows11\\DGSQ")
         database = os.getenv("DB_NAME", "TrafficInsight_ETL")
         self.dal = DataAccessLayer(server=server, database=database)
 

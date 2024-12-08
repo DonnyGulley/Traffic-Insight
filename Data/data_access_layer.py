@@ -8,8 +8,8 @@ crud = crud
 CACHE_FILE_PATH = os.path.join(os.path.dirname(__file__), "cached_accidents.json")
 # Data layer - database - fields - services
 class DataAccessLayer:
-    def __init__(self, server="lp-windows11\\DGSQL", database="TrafficInsight_ETL"):
-    # def __init__(self, server="OBIORA\\INSTANCE_ONE_SQL", database="TrafficInsight_ETL"):
+    # def __init__(self, server="lp-windows11\\DGSQL", database="TrafficInsight_ETL"):
+    def __init__(self, server="OBIORA\\INSTANCE_ONE_SQL", database="TrafficInsight_ETL"):
         self.server = server
         self.database = database
         self.connection = None
