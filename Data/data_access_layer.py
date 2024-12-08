@@ -10,6 +10,7 @@ crudETL = TrafficInsight_ETL_CRUD
 CACHE_FILE_PATH = os.path.join(os.path.dirname(__file__), "cached_accidents.json")
 # Data layer - database - fields - services
 class DataAccessLayer:
+
     def __init__(self, server, database):
     # def __init__(self, server="OBIORA\\INSTANCE_ONE_SQL", database="TrafficInsight_ETL"):
         self.server = server
