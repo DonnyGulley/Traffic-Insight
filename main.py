@@ -91,6 +91,7 @@ def login():
                 # Call the welcome_screen function to display the appropriate welcome screen
                 if welcome_screen(username, user_id, is_admin):
                     break  # If logged out, return to main menu
+                break
             else:
                 print("Error: The answer to the security question is incorrect.")
                 time.sleep(2)  # Wait before allowing the user to try again
@@ -106,7 +107,7 @@ def login():
                 print("Returning to main menu...")  # Show return message
                 time.sleep(2)  # Wait for 2 seconds before returning
                 clear_screen()  # Clear the screen before returning to the main menu
-        break  # Exit the login function after completion
+                break  # Exit the login function after completion
 
 
 def welcome_screen(username, user_id, is_admin):
@@ -116,7 +117,7 @@ def welcome_screen(username, user_id, is_admin):
         return admin_welcome(username)  # Display admin welcome screen
     else:  # If the user is a regular user
         return user_welcome(user_id, username)  # Display user welcome screen
-
+    
 
 # Entry point of the program: execute the main menu
 if __name__ == "__main__":  
