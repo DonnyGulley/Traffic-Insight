@@ -1,11 +1,20 @@
 import time
+from threading import Thread
+from time import sleep
+
+# Import modules from both scripts
+from Business.business_access_layer import BusinessAccessLayer
+from Data.data_access_layer import DataAccessLayer
+from Data.Databases.Scripts.db_intialize import get_db
 from utils import clear_screen
 from db_connection import validate_user
 from forgot_password import forgot_password_screen
 from register import register_screen
 from user_functions import admin_welcome, user_welcome
-import os
 
+# Initialize business and data layers
+bus = BusinessAccessLayer()
+dal = DataAccessLayer()
 
 def main_menu():
     """Display the main menu with options."""
@@ -36,7 +45,6 @@ def main_menu():
         else:
             print("Invalid choice. Please try again.")
             time.sleep(2)
-
 
 def login():
     """Handle user login."""

@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from Data.Databases.TrafficInsight_ETL import crud
+from Data.TrafficData.TrafficInsight_ETL_CRUD import TrafficInsight_ETL_CRUD
 import pandas as pd
 import seaborn as sns
 class Visualization:
