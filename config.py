@@ -30,6 +30,8 @@ DB_CONNECTION_STRING_TwitterX_MySQL_ETL = {
     'password': 'Passwords4Passwords2024!',
     'database': 'trafficinsight$TrafficInsight_Tweets'
 }
+
+API_Collision_URL = "https://services1.arcgis.com/qAo1OsXi67t7XgmS/arcgis/rest/services/Traffic_Collisions/FeatureServer/0/query"
 # Set the database driver based on the environment
 DB_DRIVER = 'pyodbc'
 #development use only
