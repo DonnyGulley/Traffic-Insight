@@ -1,241 +1,142 @@
 import time
 import os
-from survey import participate_in_survey
+from survey import participate_in_survey, view_survey_responses
 from consent import update_consent, get_current_consent
-from account_management import account_management_menu
+from account_management import account_management_menu, view_all_users, search_user, edit_user, delete_user
 from traffic_data import traffic_data
-from notification import view_notifications, send_notification
-
+from notification import view_notifications, send_notification_to_all, send_notification_to_user
 from export_data import export_data
-
-from Business.business_access_layer import BusinessAccessLayer
-from Data.data_access_layer import DataAccessLayer
-from Data.Databases.Scripts.db_intialize import get_db
-from threading import Thread
-from time import sleep
-
-bus = BusinessAccessLayer()
-dal = DataAccessLayer()
 
 
 def clear_screen():
-    """Clear the terminal screen."""
+    """Clear the terminal screen to improve readability."""
+    # Clears the screen based on the operating system (Windows or UNIX-like)
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def admin_welcome(username):
-    """Display the admin welcome menu and show notifications."""
+    """Display the admin welcome menu and handle admin options."""
     while True:
         clear_screen()
         print("=" * 50)
-        print(f"Welcome Admin: {username}")
+        print(f"Welcome Admin: {username}")  # Displays the admin username
         print("=" * 50)
-        print("\n1. Manage Users (in progress...)")
+        # Show available options for the admin
+        print("\n1. Manage Users ")
         print("2. View Notifications")
         print("3. Send Notifications")
-        print("4. View Activity Logs")
+        print("4. View Survey Responses")
         print("5. Log out")
         print("=" * 50)
 
         choice = input("Enter your choice: ").strip()
 
         if choice == "1":
-            print("Manage Users functionality is in progress...")
+            # If the admin chooses to manage users, call the manage_users function
+            manage_users()
             time.sleep(2)
         elif choice == "2":
+            # If the admin chooses to view notifications, call the function
             view_notifications(username, is_admin=True)
         elif choice == "3":
-            target = input("Enter 'all' to notify all users or a specific username: ").strip()
+            # If the admin chooses to send notifications, ask for target and message
+            target = input("Enter 'all' to notify all users or a specific username: ").strip().lower()
             message = input("Enter the notification message: ").strip()
-            send_notification(target, message)
+            if target == 'all':
+                # Send notification to all users
+                send_notification_to_all(message)
+            else:
+                # Send notification to a specific user
+                send_notification_to_user(target, message)
         elif choice == "4":
-            print("\nViewing Activity Logs...")
-            admin()
+            # If the admin chooses to view survey responses
+            view_survey_responses()
         elif choice == "5":
+            # If the admin chooses to log out
             print("\nLogging out...")
             time.sleep(2)
-            return False
+            return False  # Exits the loop and logs out
         else:
             print("\nInvalid choice. Please try again.")
-            time.sleep(2)
-
-
-def admin():
-    logs = bus.get_activity_logs()
-    print("\nActivity Logs:")
-    for log in logs:
-        print(log.strip())
-    time.sleep(5)
+            time.sleep(2)  # Wait for a moment before showing the menu again
 
 
 def user_welcome(user_id, username):
-    """Display the user welcome menu and show notifications."""
+    """Display the user welcome menu and handle user options."""
     while True:
         clear_screen()
         print("=" * 50)
-        print(f"Welcome User: {username}")
+        print(f"Welcome User: {username}")  # Displays the user username
         print("=" * 50)
+        # Show available options for the user
         print("\n1. Play with Traffic Data")
         print("2. View Notifications")
         print("3. Account Management")
         print("4. Export My Data")
-        print("5. Other User Menu")
-        print("6. Log out")
+        print("5. Log out")
         print("=" * 50)
 
         choice = input("Enter your choice: ").strip()
 
         if choice == "1":
+            # If the user chooses to work with traffic data, call the function
             traffic_data()
         elif choice == "2":
+            # If the user chooses to view notifications
             view_notifications(username)
         elif choice == "3":
+            # If the user chooses to manage their account
             account_management_menu(user_id, username)
         elif choice == "4":
+            # If the user chooses to export their data
             export_data(user_id, username)
         elif choice == "5":
-            other_user_menu()            
-        elif choice == "6":
+            # If the user chooses to log out
             print("\nLogging out...")
             time.sleep(2)
-            return False
+            return False  # Exits the loop and logs out
         else:
             print("\nInvalid choice. Please try again.")
-            time.sleep(2)
+            time.sleep(2)  # Wait before retrying
 
 
-def other_user_menu():
-    """
-    Displays the menu for logged-in users with appropriate features.
-    """
+def manage_users():
+    """Allow the admin to manage users by viewing, searching, editing, or deleting."""
     while True:
-        print("1. Search by Location")
-        print("2. Offline Search")
-        print("3. Notifications")
-        print("4. Feedback Menu")
-        print("5. Logout")
-        choice = input("Enter your choice: \n \n")
+        clear_screen()
+        print("=" * 50)
+        print("User Management")  # Displays the user management section
+        print("=" * 50)
+        # Show options for managing users
+        print("\n1. View All Users")
+        print("2. Search for a User")
+        print("3. Edit a User")
+        print("4. Delete a User")
+        print("5. Return to Admin Menu")
+        print("=" * 50)
+
+        choice = input("Enter your choice: ").strip()
 
         if choice == "1":
-            search_by_location()
+            # If the admin chooses to view all users
+            clear_screen()
+            view_all_users()
         elif choice == "2":
-            offline_search_menu()
+            # If the admin chooses to search for a user
+            clear_screen()
+            search_user()
         elif choice == "3":
-            monitor_notifications(dal)
+            # If the admin chooses to edit a user
+            clear_screen()
+            edit_user()
         elif choice == "4":
-            feedback_menu()
+            # If the admin chooses to delete a user
+            clear_screen()
+            delete_user()
         elif choice == "5":
-            print("Logging out...")
-            break
+            # If the admin chooses to return to the main admin menu
+            print("\nReturning to Admin Menu...")
+            break  # Exits the loop and returns to the admin menu
         else:
-            print("Invalid choice. Please try again.")
-
-
-def monitor_notifications(dal):
-    """
-    Monitors notifications for real-time updates in a separate thread.
-    """
-    def run_monitoring():
-        while True:
-            user_locations = dal.get_user_locations()
-            for location in user_locations:
-                notifications = dal.get_notifications_by_location(location)
-                if notifications:
-                    for note in notifications:
-                        print(f"{note}")
-                else:
-                    print(f"{location}: No incidents nearby.")
-            sleep(30)
-
-    notification_thread = Thread(target=run_monitoring, daemon=True)
-    notification_thread.start()
-    print("\nNotification monitoring started in the background.")
-
-
-def search_by_location():
-    location = input("Enter the location to search for accidents: ")
-    try:
-        with next(get_db()) as db:
-            results = dal.search_by_location(location)
-        print("\n".join(results))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-def offline_search_menu():
-    """
-    Submenu for offline search functionality.
-    """
-    while True:
-        print("\nOffline Search Menu:")
-        print("1. Sync Accident Data and Search")
-        print("2. Back to Main Menu")
-        choice = input("Enter your choice: \n")
-
-        if choice == "1":
-            # Sync data and perform the offline search immediately
-            sync_and_search()
-        elif choice == "2":
-            break
-        else:
-            print("Invalid choice. Please try again.")
-        
-        
-def sync_and_search():
-    """
-    Sync accident data from the database and immediately prompt the user for an offline search.
-    """
-    try:
-        # Sync data
-        message = dal.cache_accident_data()
-        print(message)
-
-        # If successful, prompt for offline search
-        if "successfully" in message.lower():
-            location = input("Enter the location to search for accidents offline:")
-            results = dal.offline_search(location)
-            print("\n".join(results))
-        else:
-            print("Failed to sync data. Please try again.")
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-def offline_search():
-    location = input("\nEnter the location to search for accidents offline: ")
-    try:
-        results = dal.offline_search(location)
-        print("\n".join(results))
-    except Exception as e:
-        print(f"An error occurred: {e}")
-
-
-def feedback_menu():
-    print("\nFeedback Menu:")
-    print("1. Add Feedback")
-    print("2. Update Feedback")
-    print("3. Search Feedback")
-    choice = input("Enter your choice: ")
-
-    if choice == "1":
-        user_id = int(input("Enter your User ID: "))
-        content = input("Enter your feedback: ")
-        with next(get_db()) as db:
-            message = bus.add_feedback(user_id, content, db)
-        print(message)
-    elif choice == "2":
-        feedback_id = int(input("Enter Feedback ID to update: "))
-        new_content = input("Enter the updated feedback: ")
-        with next(get_db()) as db:
-            message = bus.update_feedback(feedback_id, new_content, db)
-        print(message)
-    elif choice == "3":
-        user_id = int(input("Enter User ID to search feedback for: "))
-        with next(get_db()) as db:
-            feedbacks = bus.search_feedback(user_id, db)
-        if feedbacks:
-            for feedback in feedbacks:
-                print(f"Feedback ID: {feedback.id}, Content: {feedback.content}")
-        else:
-            print("No feedback found.")
-    else:
-        print("Invalid choice.")
+            print("\nInvalid choice. Please try again.")
+            input("\nPress Enter to continue...")  # Wait for input before retrying
