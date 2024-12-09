@@ -8,7 +8,7 @@ class BusinessAccessLayer:
     def __init__(self):
         # server = os.getenv("DB_SERVER", "OBIORA\\INSTANCE_ONE_SQL")
         # self.dal = DataAccessLayer(server=server, database=database)
-        server = os.getenv("DB_SERVER", "lp-windows11\\DGSQ")
+        server = os.getenv("DB_SERVER", "lp-windows11\\DGSQL")
         databaseETL = os.getenv("DB_NAME", "TrafficInsight_ETL")
         databaseTrafficInsight = os.getenv("DB_NAME", "TrafficInsight")
 

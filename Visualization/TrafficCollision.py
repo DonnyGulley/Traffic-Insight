@@ -31,7 +31,7 @@ class Visualization:
                 'InitialImpactType', 'IntTrafficControl', 'LightID', 'LightForReport', 'RoadJurisdiction', 'TrafficControlID', 
                 'TrafficControlCondition', 'ThruLaneNo', 'NorthboundDisobeyCount', 'SouthboundDisobeyCount', 
                 'PedestrianInvolved', 'CyclistInvolved', 'MotorcyclistInvolved', 'EnvironmentCondition1', 'SelfReported', 
-                'XmlImportNotes', 'LastEditedDate', 'CollisionType', 'ImpactLocation', 'Light', 'ClassificationofAccident'
+                'XmlImportNotes', 'LastEditedDate', 'CollisionType', 'ImpactLocation', 'Light', 'ClassificationofAccident', 'ImpactLocationID'
             ])
             print(df.head())  # Print the first few rows of the DataFrame for verification
         else:

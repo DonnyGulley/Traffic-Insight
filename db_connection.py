@@ -1,8 +1,8 @@
 import pyodbc
 
 # Database connection details
-server = r'OBIORA\INSTANCE_ONE_SQL'
-database = r'TrafficInsight_ETL'
+server = r'lp-windows11\DGSQL'
+database = r'TrafficInsight'
 connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}}; SERVER={server};DATABASE={database};Trusted_Connection=yes;'
 
 def validate_user(username, password):
