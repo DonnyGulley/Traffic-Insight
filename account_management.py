@@ -212,6 +212,17 @@ def edit_user():
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
 
+        # Check if the user exists in the database
+        cursor.execute("SELECT UserId FROM [User] WHERE UserId = ?", user_id)
+        user = cursor.fetchone()
+
+        # If the user is not found, raise an error
+        if not user:
+            print(f"\nError: User with UserId {user_id} not found.")
+            input("\nPress Enter to return...")
+            conn.close()
+            return
+
         print("\nLeave fields blank to keep current values.")
         new_username = input("Enter new username: ").strip()
         new_email = input("Enter new email: ").strip()
