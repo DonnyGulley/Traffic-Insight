@@ -4,3 +4,4 @@ pytest
 seaborn
 pyodbc
 pymysql
+reportlab
