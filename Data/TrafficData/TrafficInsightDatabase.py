@@ -3,22 +3,32 @@ import pandas as pd
 from datetime import datetime
 
 #class used to communicate with the Traffic Insight Collision Repo 
-class TrafficDataLoader:
+class TrafficInsightDatabase:
     def __init__(self, file_path, db_connection, db_driver):
         self.file_path = file_path
         self.db_connection = db_connection
         self.df = None
         self.db_driver = db_driver
+        
+        print("Initialized TrafficDataLoader with file_path, db_connectionion and db_diver and parameters.")
 
     #load data from file - testing
-    def load_data(self):        
+    def load_data_from_df(self, dfAPI):        
+        print(f"Loading data from file: {self.file_path}")
+        
+        self.df = dfAPI
+        
+        print("Data loaded into DataFrame.")
+        print("Columns in DataFrame:", self.df.columns)
+
+    def load_data_from_file(self, file_path):        
+        """Load data from CSV file."""
         print(f"Loading data from file: {self.file_path}")
         
         self.df = pd.read_csv(self.file_path)
         
         print("Data loaded into DataFrame.")
         print("Columns in DataFrame:", self.df.columns)
-
     #Transforming 
     def column_mapping(self):
         """Define column mapping for renaming."""
@@ -100,8 +110,9 @@ class TrafficDataLoader:
 
     def insert_data_to_sql(self, dataframe, table_name, unique_column):
         
-        connection = pyodbc.connect(self.connection_string)
-        cursor = connection.cursor()
+        #use the class instance database connection
+        
+        cursor = self.db_connection.cursor()
 
         print(dataframe.columns)
 
@@ -187,29 +198,29 @@ class TrafficDataLoader:
     #Load transformed data into SQL tables."""
     def load_to_sql(self):     
 
-        # Step 1: Insert data into CollisionTypes table
+        # Step 1: Insert table data into CollisionTypes table
         collision_types = self.df[['COLLISIONTYPE']].drop_duplicates().reset_index(drop=True)
         self.insert_data_to_sql(collision_types, 'CollisionTypes', 'COLLISIONTYPE')
 
-        # Step 2: Insert data into Classifications table
+        # Step 2: Insert table data into Classifications table
         classifications = self.df[['CLASSIFICATIONOFACCIDENT']].drop_duplicates().reset_index(drop=True)
         self.insert_data_to_sql(classifications, 'ClassificationofAccident', 'CLASSIFICATIONOFACCIDENT')
 
-        # Step 3: Insert data into other lookup tables (ImpactLocations, LightConditions, TrafficControls)
+        # Step 3: Insert table data into other lookup tables (ImpactLocations)
         impact_locations = self.df[['IMPACTLOCATION']].drop_duplicates().reset_index(drop=True)
         self.insert_data_to_sql(impact_locations, 'ImpactLocations', 'IMPACTLOCATION')
-
+        # Step 4: Insert table data into other lookup tables (LightConditions)
         light_conditions = self.df[['LIGHT']].drop_duplicates().reset_index(drop=True)
         self.insert_data_to_sql(light_conditions, 'LightConditions', 'LIGHT')
-
+        # Step 5: Insert table data into other lookup tables (TrafficControls)
         traffic_controls = self.df[['TRAFFICCONTROL']].drop_duplicates().reset_index(drop=True)
         self.insert_data_to_sql(traffic_controls, 'TrafficControls', 'TRAFFICCONTROL')
 
-        # Step 4: Prepare AccidentDetails data
+        # Step 6: Prepare AccidentDetails table data
         accident_details = self.df  # Example columns
         accident_details = self.map_foreign_keys(accident_details)
 
-        # Step 5: Insert AccidentDetails data
+        # Step 7: Insert AccidentDetails table data
         self.insert_data_to_sql(accident_details, 'AccidentDetails', 'OBJECTID')
 
 

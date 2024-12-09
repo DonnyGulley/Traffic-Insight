@@ -1,18 +1,30 @@
 import sys 
 import os
-import pymysql
+import pymysql # type: ignore
 import pyodbc
 
 from TrafficInsightAPI import TrafficCollisionsAPI
-from TrafficInsightDatabase import TrafficDataLoader
+from TrafficInsightDatabase import TrafficInsightDatabase
 
 if __name__ == "__main__":
-    # Set to False to use a file on disk    
+   
     try:
         sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
         import config
-        data_file = "Data\\TrafficData\\files\\incoming.csv"
-        # Fetch the database connection string from config.py
+        
+        import os
+
+        # Get the current working directory
+        project_root = os.getcwd()
+
+        # Construct the relative path to the directory
+        data_directory = os.path.join(project_root, 'Data\\TrafficData\\files')
+
+        print(data_directory)
+
+
+        data_file = os.path.join(data_directory, "incoming.csv")
+        # Fetch the database connection string from config.py based on dev or prd
         connection=None
         if config.DB_DRIVER == 'pyodbc':
             db_connection_string = config.DB_CONNECTION_STRING_Collision_MyODBC_ETL
@@ -29,10 +41,11 @@ if __name__ == "__main__":
         else:
             raise ValueError("Unsupported database driver")
 
-        traffic_data_sql = TrafficDataLoader(data_file, connection, config.DB_DRIVER)
+        #create instance of the database class 
+        traffic_data_sql = TrafficInsightDatabase(data_file, connection, config.DB_DRIVER)
     
         if config.Use_API:
-            url = "https://services1.arcgis.com/qAo1OsXi67t7XgmS/arcgis/rest/services/Traffic_Collisions/FeatureServer/0/query"
+            url = config.API_Collision_URL
 
             # Fetch the last available accident date from the database
             accident_date = traffic_data_sql.get_last_accident_date()
@@ -44,14 +57,18 @@ if __name__ == "__main__":
                 "f": "json"
             }
 
+            #Create instance of API class
             traffic_data_api = TrafficCollisionsAPI(url=url, params=params)
+
             traffic_data_api.fetch_data()
-            csv_path = traffic_data_api.save_to_csv(data_file)
-            traffic_data_sql = TrafficDataLoader(csv_path, connection, config.DB_DRIVER)
-            traffic_data_sql.load_data()
+            
+            #save incoming api data to file for backup
+            csv_path = traffic_data_api.save_to_csv(data_directory)
+          
+            traffic_data_sql.load_data_from_df(traffic_data_api.df)
         else:
-            # Use file
-            traffic_data_sql.load_data()
+            # Use file, create a incoming file from a api datafile backup
+            traffic_data_sql.load_data_from_file(data_file)
 
         traffic_data_sql.transform_data()
         traffic_data_sql.load_to_sql()

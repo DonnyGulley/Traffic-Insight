@@ -1,22 +1,25 @@
-from Data.Databases.TrafficInsight_ETL import crud
+from Data.TrafficData.TrafficInsight_ETL_CRUD import TrafficInsight_ETL_CRUD
 from Data.Databases.feedback import Feedback
 import pyodbc
 import json
 import os
 
-crud = crud
+crudETL = TrafficInsight_ETL_CRUD
+
+
 CACHE_FILE_PATH = os.path.join(os.path.dirname(__file__), "cached_accidents.json")
 # Data layer - database - fields - services
 class DataAccessLayer:
-    def __init__(self, server="lp-windows11\\DGSQL", database="TrafficInsight_ETL"):
-    # def __init__(self, server="OBIORA\\INSTANCE_ONE_SQL", database="TrafficInsight_ETL"):
+
+    # def __init__(self, server, database):
+    def __init__(self, server="OBIORA\\INSTANCE_ONE_SQL", database="TrafficInsight_ETL"):
         self.server = server
         self.database = database
         self.connection = None
         
         try:
-            # Assuming there's an ETL system that uses the same connection details
-            self.etl = crud.TrafficInsightETL(self.server, self.database)
+            # Assuming there's an ETL system that uses the same connection details, this would 
+            self.etl = crudETL.TrafficInsightETL(self.server, self.database)
             self.etl.connect()
         except Exception as e:
             print(f"ETL connection failed: {e}")
