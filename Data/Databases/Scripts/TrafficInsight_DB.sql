@@ -157,6 +157,17 @@ VALUES
     '1234');
 GO
 
+INSERT INTO [dbo].[User] 
+    ([username], [password], [email], [Consent], [RoleTypeId], [SecurityQuestion], [SecurityAnswer])
+VALUES 
+    ('user', 
+    CONVERT(binary(256), 'password'), 
+    'user@example.com', 
+    1,  -- Consent (1 for yes, 0 for no)
+    2,  -- RoleTypeId (1 could represent Admin, adjust as needed based on your RoleType table)
+    'userkey', 
+    '1234');
+GO
 
 CREATE TABLE [dbo].[SurveyResponses] (
     [SurveyResponseId] INT IDENTITY(1,1) PRIMARY KEY,  -- Auto-incrementing ID
