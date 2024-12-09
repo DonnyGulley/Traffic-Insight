@@ -133,3 +133,10 @@ it should report All done! when complete
 
 4. Saving Data to CSV for backup
 If using the API, the data is saved to a timestamped CSV file in the specified folder.
+
+5. Default admin created.
+   username : admin 
+   email: admin@example.com 
+   password: password 
+   Security Question : Adminkey 
+   Answer: 1234
