@@ -3,8 +3,6 @@ import os
 import time
 import json
 from colorama import Fore, Back, Style, init
-
-# Module Imports
 from survey import participate_in_survey
 from consent import update_consent, get_current_consent
 from account_management import account_management_menu
@@ -197,6 +195,7 @@ def admin():
         print(log.strip())
     time.sleep(5)
 
+# Example User Menu
 def user_welcome(user_id, username):
     while True:
         clear_screen()
