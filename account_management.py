@@ -229,6 +229,13 @@ def edit_user():
         new_role = input("Enter new role type (7 for Admin, 8 for User): ").strip()
         new_consent = input("Enter consent (1 for Yes, 0 for No): ").strip()
 
+        # Validate RoleTypeId
+        if new_role and new_role not in ['7', '8']:
+            print("\nError: Invalid role type. Role type must be '7' for Admin or '8' for User.")
+            input("\nPress Enter to return...")
+            conn.close()
+            return
+
         # Update fields if new values are provided
         if new_username:
             cursor.execute("UPDATE [User] SET username = ? WHERE UserId = ?", new_username, user_id)
