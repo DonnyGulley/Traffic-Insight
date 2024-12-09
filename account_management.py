@@ -52,7 +52,7 @@ def update_user_info(user_id):
         conn.close()
 
         # Send notification to user about the update
-        send_notification(user_id, "Your account information was updated.")
+        send_notification_to_user(user_id, "Your account information was updated.")
     except pyodbc.Error as e:
         print(f"\nDatabase error: {e}")
 
@@ -76,7 +76,7 @@ def change_consent(user_id):
 
     if update_consent(user_id, consent):  # Update the consent preference in the database
         print("\nYour consent preference has been updated successfully.")
-        send_notification(user_id, "Your consent preference was updated.")
+        send_notification_to_user(user_id, "Your consent preference was updated.")
     else:
         print("\nError updating your consent preference. Please try again.")
     
