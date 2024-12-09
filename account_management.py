@@ -258,21 +258,46 @@ def edit_user():
 def delete_user():
     """Delete a specific user."""
     user_id = input("Enter UserId of the user to delete: ").strip()
-    confirm = input(f"Are you sure you want to delete user {user_id}? Type 'yes' to confirm: ").strip().lower()
-    if confirm != "yes":
-        print("\nDeletion canceled.")
-        input("\nPress Enter to return...")
-        return
 
     try:
-        # Connect to the database and delete the user
+        # Connect to the database and check if the user is an admin
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
+
+        # Check if the user exists
+        cursor.execute("SELECT UserId, RoleTypeId FROM [User] WHERE UserId = ?", user_id)
+        user = cursor.fetchone()
+
+        # If user not found, raise an error
+        if not user:
+            print(f"\nError: User with UserId {user_id} not found.")
+            input("\nPress Enter to return...")
+            conn.close()
+            return
+        
+        # Check if the user is an admin (RoleTypeId == 7)
+        if user[1] == 7:  # 7 is for Admin
+            print("\nError: Admin users cannot delete their own account.")
+            input("\nPress Enter to return...")
+            conn.close()
+            return
+
+        # Confirm deletion
+        confirm = input(f"Are you sure you want to delete user {user_id}? Type 'yes' to confirm: ").strip().lower()
+        if confirm != "yes":
+            print("\nDeletion canceled.")
+            input("\nPress Enter to return...")
+            conn.close()
+            return
+
+        # Proceed with deletion
         cursor.execute("DELETE FROM [User] WHERE UserId = ?", user_id)
         conn.commit()
         conn.close()
+
         print("\nUser deleted successfully.")
         input("\nPress Enter to return...")
+
     except pyodbc.Error as e:
         print(f"\nDatabase error: {e}")
         input("\nPress Enter to return...")
