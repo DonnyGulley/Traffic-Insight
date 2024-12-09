@@ -50,9 +50,9 @@ def update_user_info(user_id):
         conn.commit()  # Commit the changes
         print("\nYour account information has been updated successfully.")
         conn.close()
-
+        message = "Your account information was updated."
         # Send notification to user about the update
-        send_notification_to_user(user_id, "Your account information was updated.")
+        send_notification_to_user(user_id, message)
     except pyodbc.Error as e:
         print(f"\nDatabase error: {e}")
 
@@ -62,7 +62,8 @@ def change_consent(user_id):
     print("\nManage Data Collection Consent")
     print("=" * 50)
     print("\nCurrent Preference:")
-    consent_status = get_current_consent(user_id)
+
+    consent_status = get_current_consent(user_id)  # Fetch current consent status
 
     if consent_status is None:
         print("Error fetching your consent status. Please try again later.")
@@ -71,15 +72,26 @@ def change_consent(user_id):
     # Display current consent status
     print(f"Your current consent is: {'Consented' if consent_status else 'Not Consented'}")
     print("\nWould you like to change your consent?")
-    choice = input("Type 'yes' to consent or 'no' to decline: ").strip().lower()
-    consent = 1 if choice == "yes" else 0
+    
+    # Validate user input for consent change
+    while True:
+        choice = input("Type 'yes' to consent or 'no' to decline: ").strip().lower()
+        if choice == "yes":
+            consent = 1  # Consent granted
+            break
+        elif choice == "no":
+            consent = 0  # Consent declined
+            break
+        else:
+            print("Invalid input. Please type 'yes' or 'no'.")
 
-    if update_consent(user_id, consent):  # Update the consent preference in the database
+    # Attempt to update consent in the database
+    if update_consent(user_id, consent):
         print("\nYour consent preference has been updated successfully.")
-        send_notification_to_user(user_id, "Your consent preference was updated.")
+        send_notification_to_user(user_id, message="Your consent preference was updated.")
     else:
         print("\nError updating your consent preference. Please try again.")
-    
+
     input("\nPress Enter to return to the menu...")
 
 

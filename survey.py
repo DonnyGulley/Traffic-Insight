@@ -1,7 +1,7 @@
 import pyodbc
 from db_connection import connection_string
 from utils import clear_screen
-
+import time
 
 def participate_in_survey(user_id):
     """Allow the user to participate in a survey."""
@@ -12,13 +12,14 @@ def participate_in_survey(user_id):
 
     # List of survey questions
     questions = [
-        "How satisfied are you with the system? (1-5)",
+        "How satisfied are you with the system? (1-5)",  # Numeric response expected
         "What features would you like to see in the future?",
         "Any additional comments or suggestions?"
     ]
     
     # List to store user responses
     responses = []
+
     try:
         # Establish connection to the database
         conn = pyodbc.connect(connection_string)
@@ -28,8 +29,21 @@ def participate_in_survey(user_id):
         for question in questions:
             print("\n" + question)
             answer = input("Your answer: ").strip()  # Strip any leading/trailing whitespace
-            responses.append((user_id, question, answer))  # Append response to the list
-        
+            
+            # Validate the answer for the first question (satisfaction)
+            if question == "How satisfied are you with the system? (1-5)":
+                # Ensure the answer is numeric and within the range of 1 to 5
+                while not answer.isdigit() or int(answer) < 1 or int(answer) > 5:
+                    print("Invalid input. Please enter a number between 1 and 5 for your satisfaction rating.")
+                    answer = input("Your answer: ").strip()
+            
+            # Check for empty answers in other questions
+            if not answer:
+                print("Answer cannot be empty. Please provide a response.")
+                answer = input("Your answer: ").strip()
+
+            responses.append((user_id, question, answer))  # Append valid response to the list
+
         # Insert each response into the SurveyResponses table in the database
         for response in responses:
             cursor.execute("""
@@ -40,11 +54,12 @@ def participate_in_survey(user_id):
         # Commit changes to save the responses in the database
         conn.commit()
         print("\nThank you for your feedback! Your responses have been recorded.")
-    
+        time.sleep(2)
+
     except pyodbc.Error as e:
         # Handle any database-related errors
         print(f"Database error: {e}")
-    
+        time.sleep(2)
     finally:
         conn.close()  # Ensure the connection is closed after the operation
 

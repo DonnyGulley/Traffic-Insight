@@ -5,7 +5,7 @@ from forgot_password import forgot_password_screen  # Import the screen for forg
 from register import register_screen  # Import the screen for user registration
 from user_functions import admin_welcome, user_welcome  # Import functions for admin and user welcome screens
 import os
-
+from notification import send_notification_to_user
 
 def main_menu():
     """Display the main menu with options."""

@@ -71,7 +71,7 @@ def send_notification_to_all(message):
         print(f"\nAn error occurred: {e}")
 
 
-def send_notification_to_user(username, message):
+def send_notification_to_user(userid, message):
     """Send a notification to a specific user identified by their username."""
     try:
         # Establish a connection to the database
@@ -81,16 +81,15 @@ def send_notification_to_user(username, message):
         # Insert the notification for a specific user based on their username
         cursor.execute("""
             INSERT INTO Notifications (UserId, Message, DateAdded)
-            SELECT UserId, ?, GETDATE()
-            FROM [User]
-            WHERE username = ?
-        """, message, username)
+            VALUES(? , ?, GETDATE())
+            
+        """, userid, message)
 
         # Check if any rows were affected to ensure the user exists
         if cursor.rowcount == 0:
-            print(f"User '{username}' not found. Notification not sent.")
+            print(f"User '{userid}' not found. Notification not sent.")
         else:
-            print(f"Notification sent to user '{username}'.")
+            print(f"Notification sent to user '{userid}'.")
 
         # Commit the changes and close the connection
         conn.commit()

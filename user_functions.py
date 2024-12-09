@@ -73,7 +73,8 @@ def user_welcome(user_id, username):
         print("2. View Notifications")
         print("3. Account Management")
         print("4. Export My Data")
-        print("5. Log out")
+        print("5. Participate in Survey for System Improvement")  # New option for survey participation
+        print("6. Log out")
         print("=" * 50)
 
         choice = input("Enter your choice: ").strip()
@@ -83,7 +84,7 @@ def user_welcome(user_id, username):
             traffic_data()
         elif choice == "2":
             # If the user chooses to view notifications
-            view_notifications(username)
+            view_notifications(username,is_admin=False)
         elif choice == "3":
             # If the user chooses to manage their account
             account_management_menu(user_id, username)
@@ -91,6 +92,9 @@ def user_welcome(user_id, username):
             # If the user chooses to export their data
             export_data(user_id, username)
         elif choice == "5":
+            # If the user chooses to participate in the survey
+            participate_in_survey(user_id)  # Call the function for survey participation
+        elif choice == "6":
             # If the user chooses to log out
             print("\nLogging out...")
             time.sleep(2)
@@ -98,7 +102,6 @@ def user_welcome(user_id, username):
         else:
             print("\nInvalid choice. Please try again.")
             time.sleep(2)  # Wait before retrying
-
 
 def manage_users():
     """Allow the admin to manage users by viewing, searching, editing, or deleting."""
