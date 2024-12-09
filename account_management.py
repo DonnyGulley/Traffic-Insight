@@ -176,7 +176,7 @@ def view_all_users():
         print(f"\n{'UserId':<10}{'Username':<20}{'Email':<30}{'RoleType':<10}{'Consent':<10}")
         print("-" * 80)
         for user in users:
-            role = "Admin" if user.RoleTypeId == 7 else "User"  # Check role type
+            role = "Admin" if user.RoleTypeId == 1 else "User"  # Check role type
             consent = "Yes" if user.Consent == 1 else "No"  # Check consent status
             print(f"{user.UserId:<10}{user.username:<20}{user.email:<30}{role:<10}{consent:<10}")
         input("\nPress Enter to return...")
@@ -205,7 +205,7 @@ def search_user():
             print(f"\n{'UserId':<10}{'Username':<20}{'Email':<30}{'RoleType':<10}{'Consent':<10}")
             print("-" * 80)
             for user in users:
-                role = "Admin" if user.RoleTypeId == 7 else "User"
+                role = "Admin" if user.RoleTypeId == 1 else "User"
                 consent = "Yes" if user.Consent == 1 else "No"
                 print(f"{user.UserId:<10}{user.username:<20}{user.email:<30}{role:<10}{consent:<10}")
         else:
@@ -238,12 +238,12 @@ def edit_user():
         print("\nLeave fields blank to keep current values.")
         new_username = input("Enter new username: ").strip()
         new_email = input("Enter new email: ").strip()
-        new_role = input("Enter new role type (7 for Admin, 8 for User): ").strip()
+        new_role = input("Enter new role type (1 for Admin, 2 for User): ").strip()
         new_consent = input("Enter consent (1 for Yes, 0 for No): ").strip()
 
         # Validate RoleTypeId
-        if new_role and new_role not in ['7', '8']:
-            print("\nError: Invalid role type. Role type must be '7' for Admin or '8' for User.")
+        if new_role and new_role not in ['1', '2']:
+            print("\nError: Invalid role type. Role type must be '1' for Admin or '2' for User.")
             input("\nPress Enter to return...")
             conn.close()
             return
@@ -287,8 +287,8 @@ def delete_user():
             conn.close()
             return
         
-        # Check if the user is an admin (RoleTypeId == 7)
-        if user[1] == 7:  # 7 is for Admin
+        # Check if the user is an admin (RoleTypeId == 1)
+        if user[1] == 1:  # 1 is for Admin
             print("\nError: Admin users cannot delete their own account.")
             input("\nPress Enter to return...")
             conn.close()

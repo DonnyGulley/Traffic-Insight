@@ -59,7 +59,7 @@ def login():
         if user:
             user_id = user[0]  # Get the user's ID from the validation result
             role_type_id = user[4]  # Get the user's role ID
-            is_admin = role_type_id == 7  # Check if the user is an admin (role ID 7)
+            is_admin = role_type_id == 1  # Check if the user is an admin (role ID 1)
 
             # Step 1: Email verification (first factor)
             print("\nStep 1: Email Verification")
