@@ -1,5 +1,6 @@
 import pyodbc
 from db_connection import connection_string  # Import the connection string to the database
+import time
 
 def view_notifications(username, is_admin):
     """View notifications for a user or admin."""
@@ -61,15 +62,18 @@ def send_notification_to_all(message):
         conn.close()
 
         print("Notification sent to all users.")
+        time.sleep(2)
         input("\nPress Enter to continue...")
 
     except pyodbc.Error as e:
         # Handle any database-related errors
         print(f"\nDatabase error: {e}")
+        time.sleep(2)
     except Exception as e:
         # Handle any other errors
         print(f"\nAn error occurred: {e}")
-
+        time.sleep(2)
+        
 
 def send_notification_to_user(userid, message):
     """Send a notification to a specific user identified by their username."""
@@ -88,8 +92,10 @@ def send_notification_to_user(userid, message):
         # Check if any rows were affected to ensure the user exists
         if cursor.rowcount == 0:
             print(f"User '{userid}' not found. Notification not sent.")
+            time.sleep(2)
         else:
             print(f"Notification sent to user '{userid}'.")
+            time.sleep(2)
 
         # Commit the changes and close the connection
         conn.commit()
@@ -97,9 +103,12 @@ def send_notification_to_user(userid, message):
 
         input("\nPress Enter to continue...")
 
+
     except pyodbc.Error as e:
         # Handle any database-related errors
         print(f"\nDatabase error: {e}")
+        time.sleep(2)
     except Exception as e:
         # Handle any other errors
         print(f"\nAn error occurred: {e}")
+        time.sleep(2)

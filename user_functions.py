@@ -39,15 +39,56 @@ def admin_welcome(username):
             # If the admin chooses to view notifications, call the function
             view_notifications(username, is_admin=True)
         elif choice == "3":
-            # If the admin chooses to send notifications, ask for target and message
+        # If the admin chooses to send notifications, ask for target and message
             target = input("Enter 'all' to notify all users or a specific username: ").strip().lower()
+            if not target:  # Check if target is empty
+                print("\nError: Notification target cannot be empty. Please try again.")
+                time.sleep(2)
+                continue
+
             message = input("Enter the notification message: ").strip()
+            
+            if not message:  # Check if message is empty
+                print("\nError: Notification message cannot be empty. Please try again.")
+                time.sleep(2)
+                continue
+
+            # Validate message length
+            if len(message) > 500:
+                print("\nError: Message exceeds the maximum allowed length of 500 characters. Please try again.")
+                time.sleep(2)
+                continue
+
+            # Validate unsupported characters (example: emojis or invalid symbols)
+            if any(ord(char) > 127 for char in message):
+                print("\nError: Message contains unsupported characters. Please use plain text.")
+                time.sleep(2)
+                continue
+
             if target == 'all':
                 # Send notification to all users
-                send_notification_to_all(message)
+                if send_notification_to_all(message):
+                    print("\nNotification sent to all users successfully.")
+                else:
+                    print("\nError: Unable to send notification to all users. Please try again later.")
             else:
-                # Send notification to a specific user
-                send_notification_to_user(target, message)
+                try:
+                    # Check if target is a valid username
+                    if not target.isalnum():
+                        raise ValueError("Invalid username format. Only alphanumeric characters are allowed.")
+
+                    # Attempt to send notification to a specific user
+                    if send_notification_to_user(int(target), message):
+                        print(f"\nNotification sent to user '{target}' successfully.")
+                    else:
+                        print(f"\nError: User '{target}' not found. Notification not sent.")
+                except ValueError as e:
+                    print(f"\nError: {e}")
+                except Exception as e:
+                    print(f"\nAn unexpected error occurred: {e}")
+            
+            input("\nPress Enter to return to the menu...")
+
         elif choice == "4":
             # If the admin chooses to view survey responses
             view_survey_responses()
