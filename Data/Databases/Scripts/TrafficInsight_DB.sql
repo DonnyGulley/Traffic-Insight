@@ -170,3 +170,8 @@ CREATE TABLE [dbo].[SurveyResponses] (
 );
 GO
 
+INSERT INTO [TrafficInsight].[dbo].[Roles] ([Name], [Description])
+VALUES ('admin', 'Administrator with full access to the system');
+
+INSERT INTO [TrafficInsight].[dbo].[Roles] ([Name], [Description])
+VALUES ('user', 'Standard user with limited access to the system');
