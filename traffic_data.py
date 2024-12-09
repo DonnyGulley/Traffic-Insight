@@ -28,10 +28,10 @@ def traffic_data():
         choice = input('Enter your choice: ')
         clear_screen()
         if choice == '1':
-            input_start_date = input("Enter the start date (YYYY-MM-DD) or leave empty: ('2022-01-01' if ignored): ")
+            input_start_date = input("Enter the start date (YYYY-MM-DD) or leave empty: ('2009-01-01' if ignored): ")
             if input_start_date == '' : input_start_date = '2022-01-01'
 
-            input_end_date=input("Enter the end date (YYYY-MM-DD) or leave empty ('2019-01-01' if ignored): ")
+            input_end_date=input("Enter the end date (YYYY-MM-DD) or leave empty ('2020-01-01' if ignored): ")
             if input_end_date == '' : input_end_date = '2022-02-01'
             
             bus.plot_accidents_by_collisionDate(input_start_date,input_end_date)               
